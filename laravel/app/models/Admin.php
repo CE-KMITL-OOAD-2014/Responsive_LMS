@@ -44,10 +44,10 @@
 					update(array('telephone' => $this->getTelephone()
 					,'position' => $this->getPosition(),'status_del' => $this->getStatus_del()
 					,'detail_delete' => $this->getDetail_delete()));
-					return $dataTmp;
+					return true;
 				}
 			}	
-			return true;
+			return false;
 		}
 		public static function getFromId($id){
 			$userTmp = Users::getFromId($id);
@@ -195,6 +195,28 @@
 			}
 			return false;
 		}
+		public function addSubject(Subject $subj){
+			$dataTmp = SubjectRepository::where('ID','=',$subj->getID())->orWhere('id_subject','=',$subj->getId_subject())->get();
+			if(count($dataTmp)==0){
+				$dataTmp = new SubjectRepository;
+				$dataTmp->ID = Subject::getMaxId()+1;
+				$dataTmp->id_subject = $subj->getId_subject();
+				$dataTmp->name = $subj->getName();
+				$dataTmp->group = $subj->getGroup();
+				$dataTmp->start_at = $subj->getStart_at();
+				$dataTmp->end_at = $subj->getEnd_at();
+				$dataTmp->day= $subj->getDay();
+				$dataTmp->room = $subj->getRoom();
+				$dataTmp->build = $subj->getBuild();
+				$dataTmp->detail_thai = $subj->getDetail_thai();
+				$dataTmp->detail_eng = $subj->getDetail_eng();
+				$dataTmp->save();
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
 		public function editUser(Users $user){
 			return $user->update();
 		}
@@ -206,6 +228,9 @@
 		}
 		public function editTeacher(Teacher $user){
 			return $user->update();
+		}
+		public function editSubject(Subject $subj){
+			return $subj->update();
 		}
 		public function delAdmin(Admin $user,$detail_delete){
 			$user->setDetail_delete($detail_delete);
@@ -254,7 +279,7 @@
 			'status_del = '.$this->status_del.'<br>'.
 			'detail_delete = '.$this->detail_delete.'<br>';
 		}
-		public static function userIsAdmin(Users $user){
+		public static function userIsAdmin($user){
 			return ($user!=NULL) && ($user->getStatus()== '9');
 		}
 		public static function searchExcludeDelUser($table){

@@ -1,4 +1,4 @@
-@extends('header_admin')
+@extends('header_teacher')
 
 @section('body')
 
@@ -7,29 +7,30 @@
   <!-- Begin page content -->
   <div class="container">
     <div class="page-header">
-      <h1>ระบบจัดการวิชา</h1>
+      <h1>รายการงาน</h1>
     </div>
-	
- 
+    <div class="form-inline col-lg-6">
+      <label class="checkbox-inline">
+        <input type="checkbox" id="search_date" value="search_date">
+        ค้นหาจากวันที่ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </label>
+      <input type="text" class="form-control mydate" id="start_date" placeholder="วันที่เริ่มต้น">
+      <input type="text" class="form-control mydate" id="end_date" placeholder="วันที่สิ้นสุด">
+    </div>
     <div class="input-group col-lg-6"> <span class="input-group-addon">ใส่ข้อมูลที่ต้องการค้นหา</span>
-      <input type="text" class="form-control" placeholder="ค้นหาจาก รหัสวิชา ชื่อวิชา เวลาเรียน ห้องเรียน" id="search-input">
+      <input type="text" class="form-control" placeholder="ค้นหาจาก รหัสงาน, หัวข้อ  " id="search-input">
       <span class="input-group-btn">
       <button class="btn btn-success" type="button" onclick="search_data();">ค้นหา</button>
-    </span> 
-	</div>
-	
-    <div class="input-group col-lg-6"></div>
-	  
+      </span> </div>
     <div class="panel panel-default" style="background-color:RGBA(255,255,255,0.5); margin-top:20px">
       <div class="panel-body">
         <div class="col-lg-2">
-          <div id="outline_count_mem" class="input-group input-group-sm"> <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span>&nbsp;จำนวนวิชา</span>
+          <div id="outline_count_mem" class="input-group input-group-sm"> <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span>&nbsp; จำนวนงาน</span>
             <div class="form-control" id="count_mem"> 0</div>
-            <span class="input-group-addon">วิชา</span> </div>
+            <span class="input-group-addon">งาน</span> </div>
         </div>
       </div>
     </div>
-	
+
 <ul class="pager">
       <li class="previous"><a href="#" onclick=" to_first_page();"><span class="glyphicon glyphicon-step-backward"></span> หน้าแรก</a></li>
       <li id="page_previous_1"><a id="a_previous_1" href="#" onclick="pagePrev();"><span class="glyphicon glyphicon-chevron-left"></span> หน้าก่อนหน้า</a></li>
@@ -51,17 +52,16 @@
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>รหัสวิชา</th>
-			<th>ชื่อวิชา</th>
-            <th>กลุ่ม</th>
-            <th>เวลาเรียน</th>  
-			<th>ห้องเรียน</th>			
-			<th width="8%"></th> 
+            <th width= "10%">วันที่สั่งงาน </th>
+			<th>รหัสงาน</th>
+            <th>หัวข้อ</th>
+            <th width="8%"></th>
           </tr>
         </thead>
-        <tbody id="table_subject">
+		<tbody id="table_assignment">
        
         </tbody>
+        
       </table>
     </div>
     <ul class="pager">
@@ -81,13 +81,14 @@
 
 <div class="line_col12 col-sm-12"></div>
     <div class="col-lg-12 text-center">
-      <button class="btn btn-success" onClick="location.href='{{url('admin/add_subject')}}';"><span class="glyphicon glyphicon-plus"></span> เพิ่มวิชา</button>
+      <button class="btn btn-success" onClick="location.href='{{ url('/teacher/add_assignment') }}'"><span class="glyphicon glyphicon-book"></span> สั่ง</button>
     </div>
 <div class="line_col12 col-sm-12"></div>
 	
 	
   </div>
 </div>
+
 <script type="text/javascript">
   var lastpage;
   var currentPage; 
@@ -96,18 +97,19 @@
   currentPage=1;
   search_data();
   function search_data() {
+  
         updateValElement();
-        $.get('{{ url("search_subject/search") }}',{condition:condition ,currentPage:currentPage },function(data){
-            $('#table_subject').html(data);
+        $.get('{{ url("teacher/search_assignment/search") }}',{condition:condition ,currentPage:currentPage },function(data){
+            $('#table_assignment').html(data);
         });
   }
   function updateValElement(){
     condition={word:$('#search-input').val()};
-      $.get('{{ url("search_subject/get_lastpage") }}',{condition:condition},function(data){
+      $.get('{{ url("teacher/search_assignment/get_lastpage") }}',{condition:condition},function(data){
            lastpage=data;
           $('#page_display_1,#page_display_2').html('หน้าที่ '+currentPage+' / '+lastpage)
        });
-      $.get('{{ url("search_subject/get_count") }}',{condition:condition},function(data){
+      $.get('{{ url("teacher/search_assignment/get_count") }}',{condition:condition},function(data){
            count_mem=data;
            $('#count_mem').html(count_mem); 
        });
@@ -163,4 +165,3 @@
   });
 </script>
 @stop
-

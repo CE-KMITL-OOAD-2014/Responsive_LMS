@@ -25,13 +25,13 @@
 			parent::cloneUser($user);
 			$this->setStatus('1');
 			$this->name_user=$user->getName_user();
-			$this->telephone=$user->gettelephone();
-			$this->room=$user->getroom();
-			$this->history=$user->gethistory();
-			$this->experience=$user->getexperience();
-			$this->status_del=$user->getstatus_del();
-			$this->detail_delete=$user->getdetail_delete();
-			$this->subjects=$user->getsubjects();
+			$this->telephone=$user->getTelephone();
+			$this->room=$user->getRoom();
+			$this->history=$user->getHistory();
+			$this->experience=$user->getExperience();
+			$this->status_del=$user->getStatus_del();
+			$this->detail_delete=$user->getDetail_delete();
+			$this->subjects=$user->getSubjects();
 		}
 		public static function cloneFromUser(Users $user){
 			$obj = new Teacher;
@@ -60,7 +60,7 @@
 					,'experience' => $this->getExperience()
 					,'status_del' => $this->getStatus_del()
 					,'detail_delete' => $this->getDetail_delete()));
-					return $dataTmp;
+					return true;
 				}
 			}	
 			return false;
@@ -78,13 +78,20 @@
 					$obj->setExperience($dataTmp[0]->experience);
 					$obj->setStatus_del($dataTmp[0]->status_del);
 					$obj->setDetail_delete($dataTmp[0]->detail_delete);
-		   		    //$obj->setSubject($dataTmp[0]->subject());
+					$arr = array();
+					$table=SubjectTeacherRelationshipRepository::where('id_teacher','=',$id)->where('status_del','=','0')->get();
+					for($i=0;$i<count($table);$i++){
+						$arr[$i]=$table[$i]->{'id_subject'};
+					}
+					
+		   		    $obj->setSubjects($arr);
 					return $obj;
 				}
 			}
 			return NULL;
 
 		}
+
 		public static function getFromUserPass($user,$pass){
 			$dataTmp = Users::importFromUserPass($user,$pass);
 			if(count($dataTmp)==1){
@@ -190,6 +197,20 @@
 			'experience ='.$this->experience.'<br>'.
 			'status_del ='.$this->status_del.'<br>'.
 			'detail_delete ='.$this->detail_delete.'<br>'.
-			'subjects ='.$this->subjects;
+			'subjects ='.json_encode($this->subjects);
+		}
+		public static function userIsTeacher($user){
+			return ($user!=NULL) && ($user->getStatus()== '1');
+		}
+		public function getSubjectsFromeId($id){
+			$userTmp = Users::getFromId($id);
+			$arr = array();
+			$obj = Teacher::cloneFromUser($userTmp);
+			$table=SubjectTeacherRelationshipRepository::where('id_teacher','=',$id)->where('status_del','=','0')->get();
+					for($i=0;$i<count($table);$i++){
+						$arr[$i]=$table[$i]->{'id_subject'};
+					}
+		   		    $obj->setSubjects($arr);
+			return $obj;		
 		}
 	}
