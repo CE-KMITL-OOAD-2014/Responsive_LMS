@@ -18,7 +18,7 @@
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
 			$active = array('','','','','','','','','');
-
+			$subj=null;
 			$id_subj=unserialize(Cookie::get('subject',null));
 			if($id_subj!=null){
 				$subj= Subject::getFromID($id_subj);
@@ -130,6 +130,205 @@
 				return Assignment::getCount($condition,$id_subj);
 			}
 		}
+		public function userEdit(){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');   
+			}
+
+			$tmp->setPassword(md5(Input::get('password')));
+			$tmp->update();
+			return Redirect::to('/');
+
+		}
+		public function userWaitting(){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$tmp->setTitle(Input::get('title'));
+			$tmp->setName(Input::get('name'));
+			$tmp->setSurname(Input::get('surname'));
+			$tmp->setName_user(Input::get('name_user'));
+			$tmp->setEmail(Input::get('email'));
+			$tmp->setTelephone(Input::get('telephone'));
+			$tmp->setRoom(Input::get('room'));
+			$tmp->setHistory(Input::get('history'));
+			$tmp->setExperience(Input::get('experience'));
+
+			$tmp->update();
+			return Redirect::to('/');
+
+		}
+		public function searchStudy($method){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$id_subj=unserialize(Cookie::get('subject',null));
+			$currentPage = Input::get('currentPage');
+			if($method=='search'){
+				$table_study = Study::search($currentPage,$id_subj);
+				$output = '';
+				for ($i=0;$i<count($table_study);$i++) {
+					  $date_at=$table_study[$i]->{'date_at'};
+					  if($date_at!=''){
+							$year = substr($date_at, 0, 4);
+							$year  = $year + 543;
+							$month = substr($date_at, 5, 2);
+							$day = substr($date_at, 8, 2);
+
+							$date_at = $day."-".$month."-".$year;
+					  }
+	    			  $output.= '<tr>   
+	    			 			    <td>'.$date_at.'</td>   
+								 	<td>'.$table_study[$i]->{'detail'}.'</td>  
+								 	<td><div class="btn-group">
+						             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">ดำเนินการ <span class="caret"></span> </button>
+						                <ul class="dropdown-menu pull-right" role="menu">
+						  	               <li><a href="'.url('/teacher/class_assess/'.$table_study[$i]->{'ID'}).'">ดูผลการประเมิน</a></li>
+						  	               <li><a href="'.url('/teacher/class_status/'.$table_study[$i]->{'ID'}).'">ดูสถานะขณะเรียน</a></li>
+							               </ul>
+							             </div></td>									
+							        </tr>    ';
+				}
+				return $output;
+			}
+			if($method=='get_lastpage'){
+				//return 'get_lastpage';
+				return Study::getLastpage($id_subj);
+			}
+			if($method=='get_count'){
+				//return 'get_count';
+				return Study::getCount($id_subj);
+			}
+		}
+		public function searchMessage($method){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+
+			$id_user=$tmp->getID();
+			$condition = Input::get('condition');
+			$currentPage = Input::get('currentPage');
+			if($method=='search'){
+				$table_message = Message::search($condition,$currentPage,$id_user);
+				$output = '';
+				for ($i=0;$i<count($table_message);$i++) {
+					  $date_at=$table_message[$i]->{'created_at'};
+					  if($date_at!=''){
+							$year = substr($date_at, 0, 4);
+							$year  = $year + 543;
+							$month = substr($date_at, 5, 2);
+							$day = substr($date_at, 8, 2);
+
+							$date_at = $day."-".$month."-".$year;
+					  }
+	    			  $output.= '<tr>'.   
+	    			  (($table_message[$i]->{'status'}=='1')?
+	    			 ' <td class=" text-center"><span class="glyphicon glyphicon-ok-sign green"></span></td>':
+	    			  '<td class=" text-center"><span class="glyphicon glyphicon-info-sign yellow"></span></td>')
+	    			 			   .' <td>'.$date_at.'</td>   
+								 	<td>'.$table_message[$i]->{'title'}.'</td>
+						            <td>'.$table_message[$i]->{'message'}.'</td>    									
+									<td><div class="btn-group">
+						             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">ดำเนินการ <span class="caret"></span> </button>
+						                <ul class="dropdown-menu pull-right" role="menu">
+						  	               <li><a href="'.url('/teacher/view_message/'.$table_message[$i]->{'ID'}).'">ดูรายละเอียด</a></li>
+							               </ul>
+							             </div></td>
+							        </tr>    ';
+				}
+				return $output;
+			}
+			if($method=='get_lastpage'){
+				//return 'get_lastpage';
+				$condition = Input::get('condition');
+				return Message::getLastpage($condition,$id_user);
+			}
+			if($method=='get_count'){
+				//return 'get_count';
+				$condition = Input::get('condition');
+				return Message::getCount($condition,$id_user);
+			}
+		}
+		public function searchAbsentletter($method){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+
+			$id_user=$tmp->getID();
+			//$id_user='12';
+			$condition = Input::get('condition');
+			$currentPage = Input::get('currentPage');
+			//$condition['approve'] ='1';
+			//$condition['Pending'] = '1';
+			//$condition['unapprove'] ='1';
+			//$currentPage ='1';
+			if($method=='search'){
+				$table_absent = Absent::search($condition,$currentPage,$id_user);
+				$output = '';
+				for ($i=0;$i<count($table_absent);$i++) {
+					  $created_at=$table_absent[$i]->{'created_at'};
+					  if($created_at!=''){
+							$year = substr($created_at, 0, 4);
+							$year  = $year + 543;
+							$month = substr($created_at, 5, 2);
+							$day = substr($created_at, 8, 2);
+
+							$created_at = $day."-".$month."-".$year;
+					  }
+					  $date_at=$table_absent[$i]->{'date_at'};
+					  if($date_at!=''){
+							$year = substr($date_at, 0, 4);
+							$year  = $year + 543;
+							$month = substr($date_at, 5, 2);
+							$day = substr($date_at, 8, 2);
+
+							$date_at = $day."-".$month."-".$year;
+					  }
+					  if($table_absent[$i]->{'status'}=='0'){
+							$status='<td class=" text-center"><span class="glyphicon glyphicon-ok-sign green"></span></td>';
+						}
+						else if($table_absent[$i]->{'status'}=='1'){					
+							$status='<td class=" text-center"><span class="glyphicon glyphicon-info-sign yellow"></span></td>';
+						}
+						else{
+							$status='<td class=" text-center"><span class="glyphicon glyphicon-info-sign red"></span></td>';
+						}	
+	    			  $output.= '<tr>
+									'.$status.' 
+									<td>'.$created_at.'</td>   
+								 	<td>'.$date_at.'</td>
+						            <td>'.$table_absent[$i]->{'detail'}.'</td>    									
+									<td><div class="btn-group">
+						             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">ดำเนินการ <span class="caret"></span> </button>
+						                <ul class="dropdown-menu pull-right" role="menu">
+						  	               <li><a href="'.url('/teacher/view_absentletter/'.$table_absent[$i]->{'ID'}).'">ดูรายละเอียด</a></li>
+							               </ul>
+							             </div></td>
+							        </tr>    ';
+				}
+				return $output;
+			}
+			if($method=='get_lastpage'){
+				//return 'get_lastpage';
+				$condition = Input::get('condition');
+				return Absent::getLastpage($condition,$id_user);
+			}
+			if($method=='get_count'){
+				//return 'get_count';
+				$condition = Input::get('condition');
+				return Absent::getCount($condition,$id_user);
+			}
+		}
 		public function viewAssignment($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -150,18 +349,52 @@
 				return Redirect::to('/');
 			}
 			$id_subj=unserialize(Cookie::get('subject',null));
+			$subj= Subject::getFromID($id_subj);
 			$input = new Assignment;
 			$input->setId_assignment(Input::get('id_assignment'));
 			$input->setTitle(Input::get('title'));
 			$input->setDetail(Input::get('detail'));
 			$input->setId_doc(Input::get('id_doc'));
 			$input->setId_subject($id_subj);
-			//$input->setId_teacher($tmp->getID());
 			$input->setDate_at(Input::get('date_at'));
-			$tmp->addAssignment($input);
+			$id_subtable=$subj->addAssignment($input);
+			
+			$subject= Subject::getFromID($id_subj);
+			for($i=0;$i<count($subject->getTeachers());$i++){
+				for($j=0;$j<count($subject->getStudents());$j++){
+					$contact = new Contact;
+					$contact->setSender($subject->getTeachers()[$i]->getID());
+					$contact->setReceiver($subject->getStudents()[$j]->getID());
+					$contact->setAnonymous("0");
+					$contact->setGroupid("assignment");
+					$contact->setIdsubtable($id_subtable);
+					$contact->addContact($contact);
+				}
+			}
+			
+			
 			return Redirect::to('teacher/assignment');
 		}
-		public function submitAssignment($id){
+		public function addStudy(){
+				Authen::refresh();
+				$tmp=unserialize(Cookie::get('user',null));
+				if(!Teacher::userIsTeacher($tmp)){
+					return Redirect::to('/');
+				}
+				$id_subj=unserialize(Cookie::get('subject',null));
+				if($id_subj==null){
+					return Redirect::to('/');
+				}
+				$subj= Subject::getFromID($id_subj);
+				$subjectTmp = new Study;
+				$subjectTmp->setId_subject($id_subj);
+				$subjectTmp->setDate_at(Input::get('date_at'));
+				$subjectTmp->setDetail(Input::get('detail'));
+				$subjectTmp->setNotification(Input::get('change'));	
+				$subj->addStudy($subjectTmp);
+				return Redirect::to('/teacher/study');
+		}
+		/*public function submitAssignment($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
 			if(!Teacher::userIsTeacher($tmp)){
@@ -169,12 +402,130 @@
 			}
 			$table_assignment = SubmitAssignment::search($id);
 			$header['active']=array('','','','','active','','','','');
-			if($subjInput!=NULL && $subjInput->getStatus_del()=='0'){
+			if($table_assignment!=NULL){
 				return View::make('submit_assignment',$header)->with('submita', $table_assignment);
 			}
 			return Redirect::to('/');
 			
+		}*/
+		public function viewClassStatus($id){
+			$cstatusTmp=ClassStatus::getFromIDStudy($id);
+			if($cstatusTmp!=NULL){
+				$result = $cstatusTmp->calculateStatus();
+			}
+			else{
+				$result=ClassStatus::makeEmptyStatus();
+			}
+			$header['active']=array('','','active','','','','','','');
+			return View::make('class_status',$header)->with('result', $result);
+			var_dump($result);
 		}
+		public function viewClassAssess($id){
+			$cassessTmp=ClassAssess::getFromIDStudy($id);
+			if($cassessTmp!=NULL){
+				$result = $cassessTmp->calculateResult();
+			}
+			else{
+				$result=ClassAssess::makeEmptyResult();
+			}
+			$header['active']=array('','','active','','','','','','');
+			return View::make('class_assess',$header)->with('result', $result);
+			var_dump($result);
+		}
+		public function addMessage(){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$id_subj=unserialize(Cookie::get('subject',null));
+			$subj= Subject::getFromID($id_subj);
+			$input = new Message;
+			$input->setTitle(Input::get('title'));
+			$input->setMessage(Input::get('message'));
+			$input->setStatus("0");
+			$id_subtable=$subj->addMessage($input);
+			
+			if(Input::get('receiver')=="0"){		
+				$subject= Subject::getFromID($id_subj);
+				for($j=0;$j<count($subject->getStudents());$j++){
+					$contact = new Contact;
+					$contact->setSender($tmp->getID());
+					$contact->setReceiver($subject->getStudents()[$j]->getID());
+					$contact->setAnonymous("0");			
+					$contact->setGroupid("message");
+					$contact->setIdsubtable($id_subtable);
+					$contact->addContact($contact);
+				}
+			}
+			else{
+				$contact = new Contact;
+				$contact->setSender($tmp->getID());
+				$contact->setReceiver(Input::get('receiver'));
+				$contact->setAnonymous("0");			
+				$contact->setGroupid("message");
+				$contact->setIdsubtable($id_subtable);
+				$contact->addContact($contact);
+			
+			}
+			
+			
+			return Redirect::to('teacher/message');
+		}
+		public function viewMessage($id){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$messInput = Message::getFromId($id);
+			$messInput->setStatus("1");
+			$messInput->update();
+			//$conInput = Contact::getFromId($id);
+			$header['active']=array('','','','active','','','','','');
+			if($messInput!=NULL){
+				return View::make('view_message',$header)->with('mess', $messInput);
+			}
+			return Redirect::to('/');
+		}	
+		public function viewAbsentletter($id){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$absentInput = Absent::getFromId($id);
+			$absentInput->setStatus_read("1");
+			$absentInput->update();
+			//$conInput = Contact::getFromId($id);
+			$header['active']=array('','','','','','active','','','');
+			if($absentInput!=NULL){
+				return View::make('view_absentletter',$header)->with('absent', $absentInput);
+			}
+			return Redirect::to('/');
+		}
+		public function actionApprove($id){
+			/*Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$absentInput = Absent::getFromId($id);
+			$absentInput->setStatus("0");
+			$absentInput->update();*/
+			return Redirect::to('teacher/absentletter');
+		}		
+		public function actionUnApprove($id){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Teacher::userIsTeacher($tmp)){
+				return Redirect::to('/');
+			}
+			$absentInput = Absent::getFromId($id);
+			$absentInput->setStatus("0");
+			$absentInput->update();
+			return Redirect::to('teacher/absentletter');
+		}	
 		
 	}
 	

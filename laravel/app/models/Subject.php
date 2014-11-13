@@ -1,4 +1,11 @@
 <?php
+	require_once 'sdkazure\vendor\microsoft\windowsazure\WindowsAzure\WindowsAzure.php';
+	require_once 'sdkazure\vendor\autoload.php';
+
+	use WindowsAzure\Common\ServicesBuilder;
+	use WindowsAzure\Common\ServiceException;
+	use windowsAzure\blob\models\createcontaineroptions;
+	use windowsAzure\blob\models\PublicAccessType;
 	class Subject {
 		private $id;
 		private $id_subject;
@@ -14,6 +21,7 @@
 		private $detail_thai;
 		private $detail_eng;
 		private $status_del;
+		private $detail_delete;
 		const ROWPERPAGE = 10;
 		public function __construct() {
 			$this->id=NULL;
@@ -30,6 +38,8 @@
 			$this->detail_thai=NULL;
 			$this->detail_eng=NULL;
 			$this->status_del=0;
+			$this->detail_delete=NULL;
+
 	    }
 	    public function copy(Subject $subj){
 	    	if($subj!=NULL){
@@ -46,16 +56,19 @@
 				$this->day=$subj->getDay();
 				$this->detail_thai=$subj->getDetail_thai();
 				$this->detail_eng=$subj->getDetail_eng();
-				$this->status_del=$user->getStatus_del();
+				$this->status_del=$subj->getStatus_del();
+				$this->detail_delete=$subj->getDetail_delete();
+
 			}
 	    }
 	    public static function getMaxId(){
-			$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
+	    	$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
 				return "0";
 			}
 			else{
-				return $maxid->ID;
+					$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
+					return $maxid->ID;
 			}
 		}
 		public static function getLastpage($condition){
@@ -103,6 +116,7 @@
 				$studentsTmp = SubjectStudentRelationshipRepository::where('id_subject','=',$dataTmp->ID)->where('status_del','=','0')->get();
 				for($i=0;$i<count($studentsTmp);$i++){
 					$students[$i]=Student::getFromID($studentsTmp[$i]->{'id_student'});
+					//$students[$i]=$studentsTmp[$i]->{'id_student'};
 				}
 				$obj->setStudents($students);
 				$teachers=array();
@@ -121,6 +135,7 @@
 				$obj->setDetail_thai($dataTmp->detail_thai);
 				$obj->setDetail_eng($dataTmp->detail_eng);
 				$obj->setStatus_del($dataTmp->status_del);
+				$obj->setDetail_delete($dataTmp->detail_delete);
 				return $obj;
 			}
 			else{
@@ -157,36 +172,33 @@
 					 ,'detail_thai' => $this->getDetail_thai() 
 					 ,'detail_eng' => $this->getDetail_eng() 
 					 ,'status_del' => $this->getStatus_del() 
+					 ,'detail_delete' => $this->getDetail_delete() 
 					));
 					return true;
 				}
 			return false;
 		}
-		public function StudentTeacherUpdate(){
-			$subjectStudent = SubjectStudentRelationshipRepository::where('id_subject','=',$this->getID())->
-					where('status_del','=','0')->get();
-			if(count($subjectStudent)>0){
-				DB::table('subject_student_relationship')->where('id_subject', '=',$this->getID())->
-					update(array(
-					'status_del' => '1'
-				));
+		public static function getStudentRelationMaxId(){
+			$maxid= SubjectStudentRelationshipRepository::orderBy('ID', 'DESC')->first();
+			if(!isset($maxid)){
+				return "0";
 			}
-			for($i=0;$i<count($this->getStudents());$i++){	
-				if(SubjectStudentRelationshipRepository::where('id_subject','=',$this->getID())->
-					where('id_student', '=',$this->getStudents()[$i]->getID())->count()=='1'){
-					DB::table('subject_student_relationship')->where('id_subject', '=',$this->getID())->
-						where('id_student', '=',$this->getStudents()[$i]->getID())->
-						update(array(
-						'status_del' => '0'
-						));
-				}
-				else{
-					$subjectStudentTmp = new SubjectStudentRelationshipRepository;
-					$subjectStudentTmp->id_subject=$this->getID();
-					$subjectStudentTmp->id_student=$this->getStudents()[$i]->getID();
-					$subjectStudentTmp->save();
-				}
+			else{
+					$maxid= SubjectStudentRelationshipRepository::orderBy('ID', 'DESC')->first();
+					return $maxid->ID;
 			}
+		}
+		public static function getTeacherRelationMaxId(){
+			$maxid= SubjectTeacherRelationshipRepository::orderBy('ID', 'DESC')->first();
+			if(!isset($maxid)){
+				return "0";
+			}
+			else{
+					$maxid= SubjectTeacherRelationshipRepository::orderBy('ID', 'DESC')->first();
+					return $maxid->ID;
+			}
+		}
+		public function teacherUpdate(){
 			$subjectTeacher = SubjectTeacherRelationshipRepository::where('id_subject','=',$this->getID())->
 					where('status_del','=','0')->get();
 			if(count($subjectTeacher)>0){
@@ -206,12 +218,171 @@
 				}
 				else{
 					$subjectTeacherTmp = new SubjectTeacherRelationshipRepository;
+					$subjectTeacherTmp->ID=Subject::getTeacherRelationMaxId()+1;
 					$subjectTeacherTmp->id_subject=$this->getID();
 					$subjectTeacherTmp->id_teacher=$this->getTeachers()[$i]->getID();
 					$subjectTeacherTmp->save();
 				}
 			}
 
+		}
+		public function addAssignment(Assignment $assign){
+			$dataTmp = AssignmentRepository::where('ID','=',$assign->getID())->get();
+			if(count($dataTmp)==0){
+				$dataTmp = new AssignmentRepository;
+				$dataTmp->ID = Assignment::getMaxId()+1;
+				$dataTmp->id_assignment = $assign->getId_assignment();
+				$dataTmp->title = $assign->getTitle();
+				$dataTmp->detail = $assign->getDetail();
+				$dataTmp->id_doc = $assign->getId_doc();
+				$dataTmp->id_subject = $assign->getId_subject();
+				$dataTmp->id_teacher= $assign->getId_teacher();
+				$dataTmp->date_at = $assign->getDate_at();
+				$dataTmp->save();
+				return $dataTmp->ID;
+			}
+			else{
+				return false;
+			}
+		}
+		public function addStudy(Study $study){
+			$dataTmp = StudyRepository::where('ID','=',$study->getID())->get();
+			if(count($dataTmp)==0){
+				$dataTmp = new StudyRepository;
+				$dataTmp->ID = Study::getMaxId()+1;
+				$dataTmp->id_subject = $study->getId_subject();
+				$dataTmp->date_at = $study->getDate_at();
+				$dataTmp->detail = $study->getDetail();
+				$dataTmp->notification = $study->getNotification();
+				$dataTmp->save();
+				return $dataTmp->ID;
+			}
+			else{
+				return false;
+			}
+		}
+		public function addMessage(Message $message){
+			$dataTmp = MessageRepository::where('ID','=',$message->getID())->get();
+			if(count($dataTmp)==0){
+				$dataTmp = new MessageRepository;
+				$dataTmp->ID = Message::getMaxId()+1;
+				$dataTmp->title = $message->getTitle();
+				$dataTmp->message = $message->getMessage();
+				$dataTmp->status = $message->getStatus();
+				$dataTmp->detail_delete = $message->getDetail_delete();
+				$dataTmp->save();
+				return $dataTmp->ID;
+			}
+			else{
+				return false;
+			}
+		}
+		public function addAbsentletter(Absent $abl){
+			$dataTmp = AbsentLetterRepository::where('ID','=',$abl->getID())->get();
+			if(count($dataTmp)==0){
+				$dataTmp = new AbsentLetterRepository;
+				$dataTmp->ID = Absent::getMaxId()+1;
+				$dataTmp->date_at = $abl->getDate_at();
+				$dataTmp->detail = $abl->getDetail();
+				$dataTmp->status = $abl->getStatus();
+				$dataTmp->detail_delete = $abl->getDetail_delete();
+				$dataTmp->status_read = $abl->getStatus_read();
+				$dataTmp->id_subject = $abl->getId_subject();
+				$dataTmp->id_doc = $abl->getId_doc();
+				$dataTmp->save();
+				return $dataTmp->ID;
+			}
+			else{
+				return false;
+			}
+		}
+		public function addSubmitAssignment(SubmitAssignment $sma){
+			$dataTmp = SubmitAssignmentRepository::where('ID','=',$sma->getID())->get();
+			if(count($dataTmp)==0){
+				$dataTmp = new SubmitAssignmentRepository;
+				$fileTmp = new FileRepository; 
+				$dataTmp->ID = SubmitAssignment::getMaxId()+1;
+				$dataTmp->id_assignment = $sma->getId_assignment();
+				$dataTmp->detail = $sma->getDetail();
+				if($sma->getName_file()!=NULL){
+					$dataTmp->id_doc = SubmitAssignment::getMaxFileID()+1;
+					$fileTmp->ID = SubmitAssignment::getMaxFileID()+1;
+					$fileTmp->name= $sma->getName_file();
+					$fileTmp->save();
+					//storage zone
+					$connectionString = "DefaultEndpointsProtocol=http;AccountName=rpslmssr;AccountKey=NJ7zmjCLPbw6n7ySPWZRQ0EgR48jjzolffMpMApBVPl2yYfOqgfz0To4C57/lAACSrGL/1AElzeIuwbc6lJNTA==";
+					$blobRestProxy = ServicesBuilder::getInstance()->createBlobService($connectionString);
+					$content=$sma->getContent_file();
+					$blob_name = $sma->getName_file();
+					try {
+						$blobRestProxy->createBlockBlob("docs", $blob_name, $content);
+					}
+					catch(ServiceException $e){
+						$code = $e->getCode();
+						$error_message = $e->getMessage();
+						echo $code.": ".$error_message."<br />";
+					}
+				}
+				else{
+					$dataTmp->id_doc = 0;
+				}
+				$dataTmp->status = $sma->getStatus();
+				$dataTmp->id_subject = $sma->getId_subject();
+				$dataTmp->save();
+				return $dataTmp->ID;
+			}
+			else{
+				DB::table('submit_assignment')->where('ID', '=',$sma->getID())->
+					update(array(
+					'id_assignment' => $sma->getId_assignment()
+					 ,'detail' => $sma->getDetail() 
+					 ,'id_doc' => $sma->getId_doc() 
+					 ,'status' => $sma->getStatus() 
+					 ,'id_subject' => $sma->getId_subject() 
+					 
+					));
+					return $sma->getID();
+			}
+		}
+		public function getAllSubjectFromStudent(){
+			$allsubject = array();
+			for($i=0;$i<count($this->getStudents());$i++){
+				$allsubject= $allsubject+$this->getStudents()[$i]->getSubjects();
+			}
+
+			$allsubject = array_unique($allsubject);
+			$allObjectSubject = array();
+			for($i=0;$i<count($allsubject);$i++){
+				$allObjectSubject[$i]= Subject::getFromID($allsubject[$i]);
+			}
+			return $allObjectSubject;
+		}
+		public function studentUpdate(){
+			$subjectStudent = SubjectStudentRelationshipRepository::where('id_subject','=',$this->getID())->
+					where('status_del','=','0')->get();
+			if(count($subjectStudent)>0){
+				DB::table('subject_student_relationship')->where('id_subject', '=',$this->getID())->
+					update(array(
+					'status_del' => '1'
+				));
+			}
+			for($i=0;$i<count($this->getStudents());$i++){	
+				if(SubjectStudentRelationshipRepository::where('id_subject','=',$this->getID())->
+					where('id_student', '=',$this->getStudents()[$i]->getID())->count()=='1'){
+					DB::table('subject_student_relationship')->where('id_subject', '=',$this->getID())->
+						where('id_student', '=',$this->getStudents()[$i]->getID())->
+						update(array(
+						'status_del' => '0'
+						));
+				}
+				else{
+					$subjectStudentTmp = new SubjectStudentRelationshipRepository;
+					$subjectStudentTmp->ID=Subject::getStudentRelationMaxId()+1;
+					$subjectStudentTmp->id_subject=$this->getID();
+					$subjectStudentTmp->id_student=$this->getStudents()[$i]->getID();
+					$subjectStudentTmp->save();
+				}
+			}
 		}
 		public function setID($data){
 			$this->id=$data;
@@ -296,14 +467,18 @@
 		}
 		public function getStatus_del(){
 			return $this->status_del;
-		}	
+		}
+		public function setDetail_delete($data){
+			$this->detail_delete = $data;
+		}   		
+		public function getDetail_delete(){
+			return $this->detail_delete;
+		}
 		public function toString(){
 			return 
 					'id = '.$this->id.'<br>'.
 					'id_subject = '.$this->id_subject.'<br>'.
 					'name = '.$this->name.'<br>'.
-					'students = '.json_encode($this->students).'<br>'.
-					'teachers = '.$this->teachers[0]->toString().'<br>'.
 					'group = '.$this->group.'<br>'.
 					'room = '.$this->room.'<br>'.
 					'build = '.$this->build.'<br>'.
@@ -312,6 +487,7 @@
 					'day = '.$this->day.'<br>'.
 					'detail_thai = '.$this->detail_thai.'<br>'.
 					'detail_eng = '.$this->detail_eng.'<br>'.
-					'status_del = '.$this->status_del.'<br>';
+					'status_del = '.$this->status_del.'<br>'.
+					'detail_delete ='.$this->detail_delete.'<br>';
 		}
 	}	

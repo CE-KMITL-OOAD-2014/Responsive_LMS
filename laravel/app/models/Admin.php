@@ -240,12 +240,33 @@
 		public function delStudent(Student $user,$detail_delete){
 			$user->setDetail_delete($detail_delete);
 			$user->setStatus_del('1');
+			DB::table('subject_student_relationship')->where('id_student', '=',$user->getID())->
+					update(array(
+					'status_del' => '1'
+			));
 			$this->editStudent($user);
 		}
 		public function delTeacher(Teacher $user,$detail_delete){
 			$user->setDetail_delete($detail_delete);
 			$user->setStatus_del('1');
+			DB::table('subject_teacher_relationship')->where('id_teacher', '=',$user->getID())->
+					update(array(
+					'status_del' => '1'
+			));
 			$this->editTeacher($user);
+		}
+		public function delSubject(Subject $subj,$detail_delete){
+			$subj->setDetail_delete($detail_delete);
+			$subj->setStatus_del('1');
+			DB::table('subject_student_relationship')->where('id_subject', '=',$subj->getID())->
+					update(array(
+					'status_del' => '1'
+			));
+			DB::table('subject_teacher_relationship')->where('id_subject', '=',$subj->getID())->
+					update(array(
+					'status_del' => '1'
+			));
+			$this->editSubject($subj);   
 		}
 		public function setTelephone($data){
 			$this->telephone = $data;

@@ -4,7 +4,15 @@
 <?php
 	$tmp=unserialize(Cookie::get('user',null));
 	echo $tmp->toString();
+	
+	$id_subj=unserialize(Cookie::get('subject',null));
+	$tmp=Subject::getFromID($id_subj);
+	echo "<br>";
+	echo "<br>";
+	echo "<br>";
+	//echo $tmp->toString();
 ?>
+
 <div id="wrap"> 
   <!-- Begin page content -->
   <div class="container">

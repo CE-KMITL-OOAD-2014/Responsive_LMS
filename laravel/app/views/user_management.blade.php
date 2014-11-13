@@ -1,5 +1,4 @@
-@extends('header_admin')
-
+@extends('header_admin');
 @section('body')
 
 <!-- Wrap all page content here -->

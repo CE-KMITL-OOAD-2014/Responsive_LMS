@@ -255,6 +255,17 @@
 
 			}
 		}
+		public function AdmindeleteSubject(){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Admin::userIsAdmin($tmp)){
+				return Redirect::to('/');
+			}
+			$subjInput = Subject::getFromId(Input::get('id'));
+			$detail_delete = Input::get('detail_delete');
+			$tmp->delSubject($subjInput,$detail_delete);
+			return Redirect::to('admin/subject');
+		}
 		public function searchAdmin($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -340,6 +351,25 @@
 				$condition = Input::get('condition');
 				return Student::getCount($condition);
 			}
+			if($method=='search_subject_add'){
+				$table_student = Student::search($condition,$currentPage);
+				$output = '';
+				for ($i=0;$i<count($table_student);$i++) {
+	    			  $output.= '<tr id="table'.$table_student[$i]->{'ID'}.'">   
+
+	    			 			    <td>'.$table_student[$i]->{'id_student'}.'</td>   
+								 	<td>'.$table_student[$i]->{'title'}.'</td>
+						            <td>'.$table_student[$i]->{'name'}.'</td>    
+									<td>'.$table_student[$i]->{'surname'}.'</td>
+									<td>'.$table_student[$i]->{'faculty'}.'</td>
+									<td>'.$table_student[$i]->{'department'}.'</td>
+									<td><div class="btn-group">
+						             <button type="button" id="'.$table_student[$i]->{'ID'}.'" onclick="add_student(\''.$table_student[$i]->{'ID'}.'\');"  class="btn btn-primary addstudent">เพิ่มไปยังวิชา</button>
+							             </div></td>
+							        </tr>    ';
+				}
+				return $output;
+			}
 		}
 		public function searchTeacher($method){
 			Authen::refresh();
@@ -396,7 +426,7 @@
 									<td>'.$table_teacher[$i]->{'telephone'}.'</td>
 									<td>'.$table_teacher[$i]->{'email'}.'</td>
 									<td><div class="btn-group">
-						             <button type="button" id="'.$table_teacher[$i]->{'ID'}.'"  class="btn btn-primary addteacher"></button>
+						             <button type="button" id="'.$table_teacher[$i]->{'ID'}.'" onclick="add_teacher(\''.$table_teacher[$i]->{'ID'}.'\');"  class="btn btn-primary addteacher">เพิ่มไปยังวิชา</button>
 							             </div></td>
 							        </tr>    ';
 				}
@@ -429,7 +459,7 @@
 						  	               <li><a href="'.url('view_edit_subject/'.$table_subject[$i]->{'ID'}).'">ดูรายละเอียด</a></li>
 						  	               <li><a href="'.url('subject_add_teacher/'.$table_subject[$i]->{'ID'}).'">เพิ่มอาจารย์</a></li>
 						  	               <li><a href="'.url('subject_add_student/'.$table_subject[$i]->{'ID'}).'">เพิ่มนักศึกษา</a></li>
-						 	                <li><a href="'.url('delete_user_subject/'.$table_subject[$i]->{'ID'}).'">ลบผู้ใช้งาน</a></li>
+						 	                <li><a href="'.url('delete_subject/'.$table_subject[$i]->{'ID'}).'">ลบรายวิชา</a></li>
 							               </ul>
 							             </div></td>
 							        </tr>    ';
@@ -447,11 +477,34 @@
 				return Subject::getCount($condition);
 			}
 		}
+		public function subjectEditTeacher(){
+			$teachers = Input::get('teachers');
+			$subjInput = Subject::getFromID(Input::get('id'));
+			$tmpTeacher = array();
+			for($i=0;$i<count($teachers);$i++){
+				$tmpTeacher[$i] = Teacher::getFromID($teachers[$i]);
+			}
+			$subjInput->setTeachers($tmpTeacher);
+			$subjInput->teacherUpdate();
+			return Redirect::to('/subject_add_teacher/'.Input::get('id')); 
+		}
+		public function subjectEditStudent(){
+			$students = Input::get('students');
+			$subjInput = Subject::getFromID(Input::get('id'));
+			$tmpStudent = array();
+			for($i=0;$i<count($students);$i++){
+				$tmpStudent[$i] = Student::getFromID($students[$i]);
+			}
+			$subjInput->setStudents($tmpStudent);
+			$subjInput->studentUpdate();
+			return Redirect::to('/subject_add_student/'.Input::get('id')); 
+		}
+		
 		public function userEdit(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
 			if(!Admin::userIsAdmin($tmp)){
-				return Redirect::to('/');
+				return Redirect::to('/');   
 			}
 
 			$tmp->setPassword(md5(Input::get('password')));
@@ -490,6 +543,22 @@
 			return Redirect::to('/');
 
 		}
+		public function subjectAddStudent($id){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Admin::userIsAdmin($tmp)){
+				return Redirect::to('/');
+			}
+			$subjInput = Subject::getFromId($id);
+
+			$header['active']=array('','active','','','');
+			if($subjInput!=NULL && $subjInput->getStatus_del()=='0'){
+				return View::make('subject_add_student',$header)->with('subj', $subjInput);
+			}
+			return Redirect::to('/');
+
+		}
+		
 		public function viewEditAdmin($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -581,5 +650,19 @@
 			}
 			return Redirect::to('/');
 		}
+		public function deleteSubject($id){
+			Authen::refresh();
+			$tmp=unserialize(Cookie::get('user',null));
+			if(!Admin::userIsAdmin($tmp)){
+				return Redirect::to('/');
+			}
+			$subjInput = Subject::getFromId($id);
+			$header['active']=array('','','active','','');
+			if($subjInput!=NULL && $subjInput->getStatus_del()=='0'){
+				return View::make('delete_subject',$header)->with('subj', $subjInput);
+			}
+			return Redirect::to('/');
+		}
+		
 		
 	}

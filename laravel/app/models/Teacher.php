@@ -149,7 +149,7 @@
 		public function setTelephone($data){
 			$this->telephone = $data;
 		}   		
-		public function gettelephone(){
+		public function getTelephone(){
 			return $this->telephone;
 		}
 		public function setRoom($data){
@@ -198,5 +198,19 @@
 			'status_del ='.$this->status_del.'<br>'.
 			'detail_delete ='.$this->detail_delete.'<br>'.
 			'subjects ='.json_encode($this->subjects);
+		}
+		public static function userIsTeacher($user){
+			return ($user!=NULL) && ($user->getStatus()== '1');
+		}
+		public function getSubjectsFromeId($id){
+			$userTmp = Users::getFromId($id);
+			$arr = array();
+			$obj = Teacher::cloneFromUser($userTmp);
+			$table=SubjectTeacherRelationshipRepository::where('id_teacher','=',$id)->where('status_del','=','0')->get();
+					for($i=0;$i<count($table);$i++){
+						$arr[$i]=$table[$i]->{'id_subject'};
+					}
+		   		    $obj->setSubjects($arr);
+			return $obj;		
 		}
 	}

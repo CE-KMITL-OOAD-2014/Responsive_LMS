@@ -56,7 +56,7 @@
               <label class="col-sm-1 control-label">วัน</label> 
               <div class="col-sm-2">
               		<select class="form-control" name="day" >
-              			<option value="0" >อาทิตย์</option>
+              			<option value="0"  {{$subj->getDay()=='0'?'selected':''}}  >อาทิตย์</option>
 						<option value="1" {{$subj->getDay()=='1'?'selected':''}}  >จันทร์</option>
 						<option value="2" {{$subj->getDay()=='2'?'selected':''}} >อังคาร</option>
 						<option value="3" {{$subj->getDay()=='3'?'selected':''}} >พุทธ</option>

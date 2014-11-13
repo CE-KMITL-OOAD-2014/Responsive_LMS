@@ -1,5 +1,5 @@
 <?php
-class Assignment {
+class Assignment extends Contact{
 		private $id;
 		private $id_assignment;
 		private $title;
@@ -166,25 +166,6 @@ class Assignment {
 					'id_subject = '.$this->id_subject.'<br>'.
 					'id_teacher = '.$this->id_teacher.'<br>'.
 					'date_at = '.$this->date_at.'<br>';
-		}
-		public function addAssignment(Assignment $assign){
-			$dataTmp = AssignmentRepository::where('ID','=',$assign->getID())->get();
-			if(count($dataTmp)==0){
-				$dataTmp = new AssignmentRepository;
-				$dataTmp->ID = Assignment::getMaxId()+1;
-				$dataTmp->id_assignment = $assign->getId_assignment();
-				$dataTmp->title = $assign->getTitle();
-				$dataTmp->detail = $assign->getDetail();
-				$dataTmp->id_doc = $assign->getId_doc();
-				$dataTmp->id_subject = $assign->getId_subject();
-				$dataTmp->id_teacher= $assign->getId_teacher();
-				$dataTmp->date_at = $assign->getDate_at();
-				$dataTmp->save();
-				return true;
-			}
-			else{
-				return false;
-			}
 		}
 	}
 		

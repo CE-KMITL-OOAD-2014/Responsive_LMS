@@ -37,13 +37,7 @@
 				<div class="col-sm-10">
 				  <textarea rows="4" name="detail" style="resize: vertical" class="form-control" placeholder=""></textarea>
 				</div>
-			</div>	
-			<div class="form-group">
-			 <label class="col-sm-2 control-label" for="exampleInputFile">เพิ่มเอกสาร</label>
-				<div class="col-sm-4">
-					<input type="file" name="id_doc" id="exampleInputFile">
-				</div>   
-			</div>   
+			</div>	 
           </div>
         </div>
       </div>

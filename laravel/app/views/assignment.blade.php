@@ -9,13 +9,6 @@
     <div class="page-header">
       <h1>รายการงาน</h1>
     </div>
-    <div class="form-inline col-lg-6">
-      <label class="checkbox-inline">
-        <input type="checkbox" id="search_date" value="search_date">
-        ค้นหาจากวันที่ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </label>
-      <input type="text" class="form-control mydate" id="start_date" placeholder="วันที่เริ่มต้น">
-      <input type="text" class="form-control mydate" id="end_date" placeholder="วันที่สิ้นสุด">
-    </div>
     <div class="input-group col-lg-6"> <span class="input-group-addon">ใส่ข้อมูลที่ต้องการค้นหา</span>
       <input type="text" class="form-control" placeholder="ค้นหาจาก รหัสงาน, หัวข้อ  " id="search-input">
       <span class="input-group-btn">

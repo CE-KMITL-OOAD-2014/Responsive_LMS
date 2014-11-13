@@ -109,14 +109,14 @@
             for($i=0;$i<count($subj->getTeachers());$i++){
               echo'
                 <tr>   
-                <td>'.$subj->getTeachers()[$i]->getTitle().'</td>
-                <td>'.$subj->getTeachers()[$i]->getName().'</td>
-                <td>'.$subj->getTeachers()[$i]->getSurname().'</td>
+                <td id="title'.$subj->getTeachers()[$i]->getID().'">'.$subj->getTeachers()[$i]->getTitle().'</td>
+                <td id="name'.$subj->getTeachers()[$i]->getID().'">'.$subj->getTeachers()[$i]->getName().'</td>
+                <td id="surname'.$subj->getTeachers()[$i]->getID().'">'.$subj->getTeachers()[$i]->getSurname().'</td>
                <td>'.$subj->getTeachers()[$i]->getRoom().'</td>
           <td>'.$subj->getTeachers()[$i]->getTelephone().'</td>
           <td>'.$subj->getTeachers()[$i]->getEmail().'</td>
           <td><div class="btn-group">
-            <button type="button" class="btn btn-primary ">ลบออกจากวิชา  </button>
+            <button type="button" class="btn btn-primary" onclick="delete_teacher(\''.$subj->getTeachers()[$i]->getID().'\');" id="del'.$subj->getTeachers()[$i]->getID().'">ลบออกจากวิชา</button>
             </div></td>
           </tr>
 
@@ -132,16 +132,25 @@
   </div>
 </div>
 <div class="line_col12 col-sm-12"></div>
-    <div class="col-lg-12 text-center">
-    <button type="button" class="btn btn-primary" onclick="history.back();"><span class="glyphicon glyphicon-circle-arrow-left" ></span> ย้อนกลับไปหน้าก่อนหน้า</button>     
-      <button class="btn btn-success" onClick=""><span class="glyphicon glyphicon-plus"></span> เพิ่มอาจารย์</button>
+<form class="form-horizontal" method="post" action="{{ url('subject_edit_teacher') }}">
+    <input type="hidden" name="id" value="{{$subj->getID()}}">
+    <div id="data">
+
     </div>
+    <div class="col-lg-12 text-center">
+      <button type="button" class="btn btn-primary" onclick="location.href='{{url('admin/subject')}}'"><span class="glyphicon glyphicon-circle-arrow-left" ></span> ย้อนกลับไปหน้าก่อนหน้า</button>     
+      <button class="btn btn-danger" type="button" onClick="location.reload();">ยกเลิก</button>
+      <button class="btn btn-success" type="submit" onClick=""><span class="glyphicon glyphicon-plus"></span>บันทึก</button>
+    </div> 
+</form>
 <script type="text/javascript">
   var lastpage;
   var currentPage; 
   var condition;
   var count_mem;
+  var tmp;
   var teachers = new Array();
+  var removeTeachers = new Array();
   <?php
     for($i=0;$i<count($subj->getTeachers());$i++){
       echo 'teachers.push("'.$subj->getTeachers()[$i]->getID().'");';
@@ -150,13 +159,27 @@
   currentPage=1;
   search_data();
   function search_data() {
+        tmp='';
         updateValElement();
         $.get('{{ url("search_teacher/search_subject_add") }}',{condition:condition ,currentPage:currentPage },function(data){
             $('#table_teacher').html(data);
-            for (i = 0; i < teachers.length; i++) { 
-                $('#'+teachers[i]).hide(); 
+            for (var i = 0; i < teachers.length; i++) { 
+               $('#'+teachers[i]).hide(); 
             }
+            for(var i=0;i < removeTeachers.length;i++){
+            //  alert(removeTeachers[i]);
+              $('#del'+removeTeachers[i]).hide();
+            }  
+            for (var i = 0; i < teachers.length; i++) { 
+              tmp=tmp+'<input type="hidden" name="teachers[]" class="form-control" value="'+teachers[i]+'">';
+           }
+         $('#data').html(tmp);
+
+           
+            
         });
+      //updateValElement();
+            
   }
   function updateValElement(){
        condition={word:$('#search-input').val()};
@@ -171,7 +194,29 @@
            count_mem=data;
            $('#count_mem').html(data); 
        });
-      
+           
+
+  }
+  function add_teacher(id){
+      teachers.push(id);
+      var index = removeTeachers.indexOf(id);
+      if (index > -1) {
+         removeTeachers.splice(index, 1);
+         $('#del'+id).show();
+      }
+      search_data();
+  }
+  function delete_teacher(id){
+    if(confirm("ต้องการลบ"+  $('#title'+id).html() +" "+$('#name'+id).html()+" "+ $('#surname'+id).html()+ " ออกจากวิชาใช่หรือไม่?")){
+      removeTeachers.push(id);
+      var index = teachers.indexOf(id);
+      if (index > -1) {
+         teachers.splice(index, 1);
+      }
+
+
+    }
+     search_data();
 
   }
 
@@ -209,9 +254,7 @@
       }
       search_data();
   }
-  $("button").click(function () {
-         alert('5555');
-    });
+  $()
 
   $('#go_page_field_1').keypress(function(event){
       if(event.keyCode == 13){

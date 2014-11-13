@@ -12,7 +12,7 @@
     <div class="page-header">
       <h1>รายละเอียดนักศึกษา</h1>
     </div>
-    <form class="form-horizontal" action="{{ url('delete_subject') }}" method="post">
+    <form class="form-horizontal" action="{{ url('admin_delete_subject') }}" method="post">
 	 
       <div class="col-lg-12">
         <div class="panel panel-success">
@@ -91,7 +91,7 @@
         <div class="panel panel-danger">
           <div class="panel-heading">รายละเอียด</div>
           <div class="panel-body">
-            <textarea rows="3" id="detail"class="form-control" name="detail_delete" ></textarea>
+            <textarea rows="3" id="detail"class="form-control" name="detail_delete" >{{$subj->getDetail_delete()}}</textarea>
           </div>
         </div>
       </div>
@@ -107,6 +107,7 @@
 <script>
   $("textarea").prop('disabled',true);
   $("input").prop('disabled',true);
+  $("select").prop('disabled',true);
   $("#id").prop('disabled',false);
   $("#detail").prop('disabled',false);
 </script>

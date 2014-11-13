@@ -32,32 +32,27 @@
       <ul class="nav navbar-nav">
         <li class="{{$active[1]}}"><a href="{{ url('/teacher/subject_profile') }}">ระบบจัดการข้อมูลรายวิชา</a></li>
 		
-		 <li class="dropdown {{$active[2]}}">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">จัดการการเรียน <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="{{ url('/teacher/study') }}">ระบบจัดการการเรียน</a></li>
-            <li><a href="{{ url('/teacher/study_doc') }}">ระบบจัดการเอกสารการเรียน</a></li>
-          </ul>
-        </li>
+      <li class="{{$active[2]}}"><a href="{{ url('/teacher/study') }}">จัดการการเรียน</a></li>
 		<li class="{{$active[3]}}"><a href="{{ url('/teacher/message') }}">จัดการข้อความ</a></li>
 		
         <li class="dropdown {{$active[4]}}">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">จัดการงาน <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="{{ url('/teacher/assignment') }}">ระบบจัดการงานที่สั่ง</a></li>       
-            <li><a href="{{ url('/teacher/summit_assignment') }}">ระบบจัดการงานที่ส่ง</a></li>
 			<li class="divider"></li>
 			<li><a href="{{ url('/teacher/score') }}">ระบบจัดการคะแนน</a></li>         
           </ul>
         </li>
+
 		<li class="{{$active[5]}}"><a href="{{ url('/teacher/absentletter') }}">จัดการใบลา</a></li>
-		<li class="{{$active[6]}}"><a href="{{ url('/teacher/estimate') }}">จัดการการประเมิน</a></li>
-		<li class="{{$active[7]}}"><a href="{{ url('/teacher/studying_status') }}">จัดการสถานะขณะเรียน</a></li>
 		
 		
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="{{$active[8]}}"><a href="{{ url('/teacher/user_management') }}">จัดการข้อมูลส่วนตัว</a></li>      
+      <ul class="nav navbar-nav navbar">
+        <li class="{{$active[8]}}"><a href="{{ url('/teacher/user_management_teacher') }}">จัดการข้อมูลส่วนตัว</a></li>      
+      </ul>
+      <ul class="nav navbar-nav navbar-right ">
+        <li><a href="{{ url('/logout') }}">Logout</a></li>      
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

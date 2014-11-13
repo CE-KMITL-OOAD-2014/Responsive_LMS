@@ -25,10 +25,10 @@ class Authen extends BaseController {
 			return Redirect::to('/admin');
 		}
 		if($tmp->getStatus()=='1'){
-			return 'teacher';
+			return Redirect::to('/teacher');
 		}
 		if($tmp->getStatus()=='0'){
-			return 'student';
+			return Redirect::to('/student');
 		}
 
 	//phpinfo();
@@ -56,6 +56,23 @@ class Authen extends BaseController {
 					}
 				}
 			}
+			if($user_tmp->getStatus()=='1'){
+				$user_tmp = Teacher::getFromUserPass($user_id,$user_password);
+				if($user_tmp!=NULL){
+					if($user_tmp->getStatus_del()=='0'){
+						Cookie::queue('user',serialize($user_tmp),120);
+					}
+				}
+			}
+			if($user_tmp->getStatus()=='0'){
+				$user_tmp = Student::getFromUserPass($user_id,$user_password);
+				if($user_tmp!=NULL){
+					if($user_tmp->getStatus_del()=='0'){
+						Cookie::queue('user',serialize($user_tmp),120);
+					}
+				}
+			}
+
 						
 		}
 
