@@ -50,13 +50,12 @@
 			}
 	    }
 	    public static function getMaxId(){
-	    	$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
+			$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
 				return "0";
 			}
 			else{
-					$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
-					return $maxid->ID;
+				return $maxid->ID;
 			}
 		}
 		public static function getLastpage($condition){
@@ -104,7 +103,6 @@
 				$studentsTmp = SubjectStudentRelationshipRepository::where('id_subject','=',$dataTmp->ID)->where('status_del','=','0')->get();
 				for($i=0;$i<count($studentsTmp);$i++){
 					$students[$i]=Student::getFromID($studentsTmp[$i]->{'id_student'});
-					//$students[$i]=$studentsTmp[$i]->{'id_student'};
 				}
 				$obj->setStudents($students);
 				$teachers=array();
@@ -164,55 +162,7 @@
 				}
 			return false;
 		}
-		public static function getStudentRelationMaxId(){
-			$maxid= SubjectStudentRelationshipRepository::orderBy('ID', 'DESC')->first();
-			if(!isset($maxid)){
-				return "0";
-			}
-			else{
-					$maxid= SubjectStudentRelationshipRepository::orderBy('ID', 'DESC')->first();
-					return $maxid->ID;
-			}
-		}
-		public static function getTeacherRelationMaxId(){
-			$maxid= SubjectTeacherRelationshipRepository::orderBy('ID', 'DESC')->first();
-			if(!isset($maxid)){
-				return "0";
-			}
-			else{
-					$maxid= SubjectTeacherRelationshipRepository::orderBy('ID', 'DESC')->first();
-					return $maxid->ID;
-			}
-		}
-		public function teacherUpdate(){
-			$subjectTeacher = SubjectTeacherRelationshipRepository::where('id_subject','=',$this->getID())->
-					where('status_del','=','0')->get();
-			if(count($subjectTeacher)>0){
-				DB::table('subject_teacher_relationship')->where('id_subject', '=',$this->getID())->
-					update(array(
-					'status_del' => '1'
-				));
-			}
-			for($i=0;$i<count($this->getTeachers());$i++){	
-				if(SubjectTeacherRelationshipRepository::where('id_subject','=',$this->getID())->
-					where('id_teacher', '=',$this->getTeachers()[$i]->getID())->count()=='1'){
-					DB::table('subject_teacher_relationship')->where('id_subject', '=',$this->getID())->
-						where('id_teacher', '=',$this->getTeachers()[$i]->getID())->
-						update(array(
-						'status_del' => '0'
-						));
-				}
-				else{
-					$subjectTeacherTmp = new SubjectTeacherRelationshipRepository;
-					$subjectTeacherTmp->ID=Subject::getTeacherRelationMaxId()+1;
-					$subjectTeacherTmp->id_subject=$this->getID();
-					$subjectTeacherTmp->id_teacher=$this->getTeachers()[$i]->getID();
-					$subjectTeacherTmp->save();
-				}
-			}
-
-		}
-		public function studentUpdate(){
+		public function StudentTeacherUpdate(){
 			$subjectStudent = SubjectStudentRelationshipRepository::where('id_subject','=',$this->getID())->
 					where('status_del','=','0')->get();
 			if(count($subjectStudent)>0){
@@ -232,12 +182,36 @@
 				}
 				else{
 					$subjectStudentTmp = new SubjectStudentRelationshipRepository;
-					$subjectStudentTmp->ID=Subject::getStudentRelationMaxId()+1;
 					$subjectStudentTmp->id_subject=$this->getID();
 					$subjectStudentTmp->id_student=$this->getStudents()[$i]->getID();
 					$subjectStudentTmp->save();
 				}
 			}
+			$subjectTeacher = SubjectTeacherRelationshipRepository::where('id_subject','=',$this->getID())->
+					where('status_del','=','0')->get();
+			if(count($subjectTeacher)>0){
+				DB::table('subject_teacher_relationship')->where('id_subject', '=',$this->getID())->
+					update(array(
+					'status_del' => '1'
+				));
+			}
+			for($i=0;$i<count($this->getTeachers());$i++){	
+				if(SubjectTeacherRelationshipRepository::where('id_subject','=',$this->getID())->
+					where('id_teacher', '=',$this->getTeachers()[$i]->getID())->count()=='1'){
+					DB::table('subject_teacher_relationship')->where('id_subject', '=',$this->getID())->
+						where('id_teacher', '=',$this->getTeachers()[$i]->getID())->
+						update(array(
+						'status_del' => '0'
+						));
+				}
+				else{
+					$subjectTeacherTmp = new SubjectTeacherRelationshipRepository;
+					$subjectTeacherTmp->id_subject=$this->getID();
+					$subjectTeacherTmp->id_teacher=$this->getTeachers()[$i]->getID();
+					$subjectTeacherTmp->save();
+				}
+			}
+
 		}
 		public function setID($data){
 			$this->id=$data;
@@ -329,7 +303,7 @@
 					'id_subject = '.$this->id_subject.'<br>'.
 					'name = '.$this->name.'<br>'.
 					'students = '.json_encode($this->students).'<br>'.
-					'teachers = '.json_encode($this->teachers).'<br>'.
+					'teachers = '.$this->teachers[0]->toString().'<br>'.
 					'group = '.$this->group.'<br>'.
 					'room = '.$this->room.'<br>'.
 					'build = '.$this->build.'<br>'.

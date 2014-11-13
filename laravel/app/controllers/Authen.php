@@ -25,7 +25,7 @@ class Authen extends BaseController {
 			return Redirect::to('/admin');
 		}
 		if($tmp->getStatus()=='1'){
-			return Redirect::to('/teacher');
+			return 'teacher';
 		}
 		if($tmp->getStatus()=='0'){
 			return 'student';
@@ -50,14 +50,6 @@ class Authen extends BaseController {
 		if($user_tmp!=NULL){
 			if($user_tmp->getStatus()=='9'){
 				$user_tmp = Admin::getFromUserPass($user_id,$user_password);
-				if($user_tmp!=NULL){
-					if($user_tmp->getStatus_del()=='0'){
-						Cookie::queue('user',serialize($user_tmp),120);
-					}
-				}
-			}
-			if($user_tmp->getStatus()=='1'){
-				$user_tmp = Teacher::getFromUserPass($user_id,$user_password);
 				if($user_tmp!=NULL){
 					if($user_tmp->getStatus_del()=='0'){
 						Cookie::queue('user',serialize($user_tmp),120);

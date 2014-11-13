@@ -31,7 +31,7 @@
 		    $this->adviser=NULL;
 		    $this->status_del=NULL;
 			$this->detail_delete=NULL;
-		    $this->subjects=NULL;
+		    $this->subject=NULL;
 		}
 		public function copy(Student $user){
 			parent::cloneUser($user);
@@ -49,7 +49,7 @@
 		    $this->adviser=$user->getAdviser();
 		    $this->status_del=getStatus_del();
 			$this->detail_delete=getDetail_delete();
-		    $this->subjects=$user->getSubjects();
+		    $this->subject=$user->getSubject();
 		}
 		public static function cloneFromUser(Users $user){
 			$obj = new Student;
@@ -100,15 +100,9 @@
 		   		    $obj->setDepartment($dataTmp[0]->department);
 		   		    $obj->setMajor($dataTmp[0]->major);
 		   		    $obj->setAdviser($dataTmp[0]->adviser);
-		   		    $obj->setStatus_del($dataTmp[0]->status_del);  
+		   		    $obj->setStatus_del($dataTmp[0]->status_del);
 					$obj->setDetail_delete($dataTmp[0]->detail_delete);
-		   		    $arr = array();
-					$table=SubjectStudentRelationshipRepository::where('id_student','=',$id)->where('status_del','=','0')->get();
-					for($i=0;$i<count($table);$i++){
-						$arr[$i]=$table[$i]->{'id_subject'};
-					}
-					
-		   		    $obj->setSubjects($arr);
+		   		    //$obj->setSubject($dataTmp[0]->subject());
 					return $obj;
 				}
 			}
