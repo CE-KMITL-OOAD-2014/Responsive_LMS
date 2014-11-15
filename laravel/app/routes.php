@@ -1,11 +1,11 @@
 <?php
-	require_once 'sdkazure\vendor\microsoft\windowsazure\WindowsAzure\WindowsAzure.php';
-	require_once 'sdkazure\vendor\autoload.php';
+	//require_once 'sdkazure\vendor\microsoft\windowsazure\WindowsAzure\WindowsAzure.php';
+	//require_once 'sdkazure\vendor\autoload.php';
 
-	use WindowsAzure\Common\ServicesBuilder;
-	use WindowsAzure\Common\ServiceException;
-	use windowsAzure\blob\models\createcontaineroptions;
-	use windowsAzure\blob\models\PublicAccessType;
+	//use WindowsAzure\Common\ServicesBuilder;
+	//use WindowsAzure\Common\ServiceException;
+	//use windowsAzure\blob\models\createcontaineroptions;
+	//use windowsAzure\blob\models\PublicAccessType;
 	/*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -43,6 +43,8 @@ Route::post('/user_management/edit/admin','AdminController@userEdit');
 Route::post('/user_management/waitting/admin','AdminController@userWaitting');
 Route::post('/user_management/edit/teacher','TeacherController@userEdit');
 Route::post('/user_management/waitting/teacher','TeacherController@userWaitting');
+Route::post('/user_management/edit/student','StudentController@userEdit');
+Route::post('/user_management/waitting/student','StudentController@userWaitting');
 Route::post('/add_subject','AdminController@addSubject');
 Route::post('/edit_subject','AdminController@editSubject');
 Route::get('/delete_subject/{id}','AdminController@deleteSubject');
@@ -51,11 +53,14 @@ Route::post('/subject_edit_teacher','AdminController@subjectEditTeacher');
 Route::post('/subject_edit_student','AdminController@subjectEditStudent');
 Route::get('/test/user_is_admin','Test@userIsAdmin');
 Route::get('/test/search_exclude_delUser','Test@searchExcludeDelUser');
+
 Route::get('/test',function(){
-	$table = DB::table('contact')
-            				->join('absentletter', 'contact.idsubtable', '=', 'absentletter.ID')->where('contact.group_id','=','absentletter')
-            				->where('contact.receiver','=','12')->get();
-   return json_encode($table);
+	$file =fopen("https://rpslmssr.blob.core.windows.net/docs/2014-11-13%2017:27:123%20Numerical%20Methods.pdf","r");
+	//$file ="https://rpslmssr.blob.core.windows.net/docs/2014-11-13%2017:27:123%20Numerical%20Methods.pdf";
+	$contents = stream_get_contents($file);
+	header("Content-type: text/plain");
+	header("Content-Disposition: attachment; filename=test.pdf");
+	return  $contents;
 	
 });
 Route::get('/testmethod/create_container',function(){
@@ -138,14 +143,20 @@ Route::get('/teacher/class_status/{id}','TeacherController@viewClassStatus');
 Route::get('/teacher/class_assess/{id}','TeacherController@viewClassAssess');
 Route::get('/teacher/view_message/{id}','TeacherController@viewMessage' );
 Route::get('/teacher/search_message/{method}','TeacherController@searchMessage' );
-Route::get('/teacher/searchAbsentletter/search',function(){
-	
-});
+Route::get('/teacher/download_file_assignment/{id}','TeacherController@downloadFileAssignment');
+Route::get('/teacher/download_file_absent/{id}','TeacherController@downloadFileAbsent');
 Route::get('/teacher/search_absentletter/{method}','TeacherController@searchAbsentletter' );
 Route::get('/teacher/view_absentletter/{id}','TeacherController@viewAbsentletter' );
 Route::get('/teacher/action_approve/{id}','TeacherController@actionApprove' );
 Route::get('/teacher/action_unapprove/{id}','TeacherController@actionUnApprove' );
+Route::get('/teacher/search_submit_assignment/{method}','TeacherController@searchSubmitAssignment' );
+Route::get('/teacher/view_submit_assignment/{id}','TeacherController@viewSubmitAssignment' );
+Route::post('/teacher/edit_submit_assignment','TeacherController@editSubmitAssignment');
 
+Route::get('/student/s_class_status/{id}','StudentController@setClassStatus');
+Route::get('/student/s_class_assess/{id}','StudentController@setClassAssess');
+Route::get('student/set_class_status/{id}/{i}','StudentController@setClassStatusAction');
+Route::get('student/set_class_assess/{id}','StudentController@setClassAssessAction');
 Route::get('/student','StudentController@showHome');
 Route::get('/student/{page}','StudentController@showPage' );
 Route::post('/student/action_lms','StudentController@actionLMS' );
@@ -158,3 +169,5 @@ Route::get('/student/view_message/{id}','StudentController@viewMessage' );
 Route::post('/student/add_absentletter','StudentController@addAbsentletter' );
 Route::get('/student/view_add_submit_assignment/{id}','StudentController@viewAddSubmitAssignment' );
 Route::post('/student/add_submit_assignment','StudentController@addSubmitAssignment' );
+Route::get('/student/search_absentletter/{method}','StudentController@searchAbsentletter' );
+Route::get('/student/s_score','StudentController@score' );

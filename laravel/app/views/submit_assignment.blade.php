@@ -14,10 +14,10 @@
     <div class="panel-body">
     <div class="input-group col-lg-12">
       <label class="checkbox-inline">
-        <input type="checkbox" id="show_data" value="show_data_01" checked>
+        <input type="checkbox" id="show_data_01" value="show_data_01" onclick="search_data();" checked>
         <span class="glyphicon glyphicon-ok-sign green"></span>งานที่ตรวจแล้ว</label>
       <label class="checkbox-inline">
-        <input type="checkbox" id="show_data" value="show_data_02" checked>
+        <input type="checkbox" id="show_data_02" value="show_data_02" onclick="search_data();" checked>
         <span class="glyphicon glyphicon-info-sign yellow "></span>งานที่ยังไม่ตรวจ</label>
 	  <label class="checkbox-inline">
         <input  type="hidden" id="ass_input" value="{{ $ass->getId_assignment() }}" ></label>
@@ -62,6 +62,7 @@
             <th>รหัสนักศึกษา</th>
 			<th>หมายเหตุ</th>
 			<th>เอกสาร</th>
+			<th>คะแนน</th>
             <th width="8%"></th>
           </tr>
         </thead>
@@ -102,10 +103,12 @@
   
         updateValElement();
         $.get('{{ url("teacher/search_submit_assignment/search") }}',{condition:condition ,currentPage:currentPage },function(data){
+            //alert(data);
             $('#table_submit').html(data);
         });
   }
   function updateValElement(){
+   // condition={check:'1',uncheck:'0',idass:'1'};
     condition={check:$('#show_data_01').prop("checked")?'1':'0',uncheck:$('#show_data_02').prop("checked")?'1':'0',idass:$('#ass_input').val()};
       $.get('{{ url("teacher/search_submit_assignment/get_lastpage") }}',{condition:condition},function(data){
            lastpage=data;
@@ -113,7 +116,7 @@
        });
       $.get('{{ url("teacher/search_submit_assignment/get_count") }}',{condition:condition},function(data){
            count_mem=data;
-           $('#count_mem').html(count_mem); 
+           $('#count_mem').html(count_mem); ''
        });
   }
   function pageNext(){
@@ -132,7 +135,7 @@
       currentPage=1;
       search_data();
   }
-  function  to_last_page(){
+  function  to_last_page(id){
       currentPage=lastpage;
       search_data();
   }
@@ -160,5 +163,6 @@
           go_to_page2();
       }
   });
+
 </script>
 @stop

@@ -281,6 +281,7 @@
 			$dataTmp = AbsentLetterRepository::where('ID','=',$abl->getID())->get();
 			if(count($dataTmp)==0){
 				$dataTmp = new AbsentLetterRepository;
+				$fileTmp = new FileRepository; 
 				$dataTmp->ID = Absent::getMaxId()+1;
 				$dataTmp->date_at = $abl->getDate_at();
 				$dataTmp->detail = $abl->getDetail();
@@ -288,7 +289,29 @@
 				$dataTmp->detail_delete = $abl->getDetail_delete();
 				$dataTmp->status_read = $abl->getStatus_read();
 				$dataTmp->id_subject = $abl->getId_subject();
-				$dataTmp->id_doc = $abl->getId_doc();
+				if($abl->getName_file()!=NULL){
+					$dataTmp->id_doc = Absent::getMaxFileID()+1;
+					$fileTmp->ID = Absent::getMaxFileID()+1;
+					$fileTmp->name= $abl->getName_file();
+					$fileTmp->save();
+					//storage zone
+					$connectionString = "DefaultEndpointsProtocol=http;AccountName=rpslmssr;AccountKey=NJ7zmjCLPbw6n7ySPWZRQ0EgR48jjzolffMpMApBVPl2yYfOqgfz0To4C57/lAACSrGL/1AElzeIuwbc6lJNTA==";
+					$blobRestProxy = ServicesBuilder::getInstance()->createBlobService($connectionString);
+					$content=$abl->getContent_file();
+					$blob_name = $abl->getName_file();
+					try {
+						$blobRestProxy->createBlockBlob("docs", $blob_name, $content);
+					}
+					catch(ServiceException $e){
+						$code = $e->getCode();
+						$error_message = $e->getMessage();
+						echo $code.": ".$error_message."<br />";
+					}
+				}
+				else{
+					$dataTmp->id_doc = 0;
+				}
+
 				$dataTmp->save();
 				return $dataTmp->ID;
 			}
@@ -383,6 +406,57 @@
 					$subjectStudentTmp->save();
 				}
 			}
+		}
+		public function setClassStatus($id_student,$id,$i){
+			$tmp = ClassStatus::getFromIDStudy($id);
+			if($tmp!=NULL){
+				$tmpStudent = $tmp->getId_student();
+				$tmpStatus = $tmp->getStatus();
+				if(in_array($id_student,$tmpStudent)){
+					$index = array_search($id_student,$tmpStudent);
+					$tmpStatus[$index] = $i;
+				}
+				else{
+					$tmpStudent[max(array_keys($tmpStudent))+1] = $id_student;
+					$tmpStatus[max(array_keys($tmpStatus))+1] = $i;
+				}
+				$tmp->setId_student($tmpStudent);
+				$tmp->setStatus($tmpStatus);
+
+			}
+			else{
+				$tmp = new ClassStatus;
+				$tmp->setId_study($id);
+				$tmp->setId_student(array($id_student));
+				$tmp->setStatus(array($i));
+			}
+			$tmp->update();
+
+
+		}
+		public function setClassAssess($id_student,$id,$score){
+			$tmp = ClassAssess::getFromIDStudy($id);
+			if($tmp!=NULL){
+				$tmpStudent = $tmp->getId_student();
+				$tmpScore = $tmp->getScore();
+				if(in_array($id_student,$tmpStudent)){
+					$index = array_search($id_student,$tmpStudent);
+					$tmpScore[$index] = $score;
+				}
+				else{
+					$tmpStudent[max(array_keys($tmpStudent))+1] = $id_student;
+					$tmpScore[max(array_keys($tmpScore))+1] = $score;
+				}
+				$tmp->setId_student($tmpStudent);
+				$tmp->setScore($tmpScore);
+			}
+			else{
+				$tmp = new ClassAssess;
+				$tmp->setId_study($id);
+				$tmp->setId_student(array($id_student));
+				$tmp->setScore(array($score));
+			}
+			$tmp->update();
 		}
 		public function setID($data){
 			$this->id=$data;

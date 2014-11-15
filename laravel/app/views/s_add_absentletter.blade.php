@@ -9,7 +9,7 @@
     <div class="page-header">
       <h1>ใบลา</h1>
     </div> 
-    <form class="form-horizontal" method="post" action="{{ url('student/add_absentletter') }}" >         
+    <form class="form-horizontal" method="post" action="{{ url('student/add_absentletter') }}" enctype="multipart/form-data" >         
 	  <div class="col-lg-12">
         <div class="panel panel-success">
           <div class="panel-heading">รายละเอียด</div>
@@ -29,9 +29,9 @@
 			<div class="form-group">
 			 <label class="col-sm-2 control-label" for="exampleInputFile">เพิ่มเอกสาร</label>
 				<div class="col-sm-4">
-					<input type="file" id="exampleInputFile">
+					<input type="file" name="id_doc">
 				</div>   
-			</div>   
+			</div>    
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 @section('body')
 <?php
+	$user= Users::getFromID($mess->getSender());
 	$date_at=$mess->getCreated_at();
 	if($date_at!=''){
 		$year = substr($date_at, 0, 4);
@@ -32,7 +33,7 @@
 			<div class="form-group">
 			 <label class="col-sm-2 control-label">ข้อความจาก</label>
 				<div class="col-sm-4">
-				  <input type="text" class="form-control" disabled value="">
+				  <input type="text" class="form-control" disabled value="{{ $user->getname() }}">
 				</div>
 			 <label class="col-sm-2 control-label">วันที่ได้รับข้อความ</label>
 				<div class="col-sm-4">

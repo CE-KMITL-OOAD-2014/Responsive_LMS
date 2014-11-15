@@ -5,10 +5,14 @@
 		private $id_student;
 		private $text_status;
 		public function __construct() {
+			$txtTmp = ClassStatusTextRepository::all();
    			$this->id_study=NULL;
 			$this->status=NULL;
 			$this->id_student=NULL;
 			$this->text_status=NULL;
+			for($i=0;$i<count($txtTmp);$i++){
+					$text_statusTmp[$txtTmp[$i]->{'number'}] =  $txtTmp[$i]->{'text'};
+			}
     	}
     	public function cloneClassStatus(ClassStatus $classStatus){	
 			if($classStatus!=NULL){
@@ -77,6 +81,32 @@
 					$result[$text_statusTmp[$i]]=0;
 			}
 			return $result;
+		}
+		public function update(){
+			var_dump($this->getStatus());
+			var_dump($this->getId_student());
+			
+		 	 for($i=0;$i<count($this->getId_student());$i++){
+				$n=ClassStatusRepository::where('id_study','=',$this->getId_study())
+					->where('id_student','=',$this->getId_student()[$i])->count();
+					echo($n);
+				if($n>0){
+					DB::table('class_status')->where('id_study', '=',$this->getId_study())
+						->where('id_student','=',$this->getId_student()[$i])->
+					update(array(
+						'status' => $this->getStatus()[$i]
+					));
+				}
+				else{
+					$tmp = new ClassStatusRepository;
+					$tmp->ID = ClassStatus::getMaxId()+1;
+					$tmp->id_study = $this->getId_study();
+					$tmp->status = $this->getStatus()[$i];
+					$tmp->id_student = $this->getId_student()[$i];
+					$tmp->save();
+				}
+			}	
+			
 		}
 		public function setId_study($data){
 			$this->id_study = $data;

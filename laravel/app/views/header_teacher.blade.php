@@ -32,18 +32,9 @@
       <ul class="nav navbar-nav">
         <li class="{{$active[1]}}"><a href="{{ url('/teacher/subject_profile') }}">ระบบจัดการข้อมูลรายวิชา</a></li>
 		
-      <li class="{{$active[2]}}"><a href="{{ url('/teacher/study') }}">จัดการการเรียน</a></li>
+        <li class="{{$active[2]}}"><a href="{{ url('/teacher/study') }}">จัดการการเรียน</a></li>
 		<li class="{{$active[3]}}"><a href="{{ url('/teacher/message') }}">จัดการข้อความ</a></li>
-		
-        <li class="dropdown {{$active[4]}}">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">จัดการงาน <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="{{ url('/teacher/assignment') }}">ระบบจัดการงานที่สั่ง</a></li>       
-			<li class="divider"></li>
-			<li><a href="{{ url('/teacher/score') }}">ระบบจัดการคะแนน</a></li>         
-          </ul>
-        </li>
-
+		<li class="{{$active[4]}}"><a href="{{ url('/teacher/assignment') }}">ระบบจัดการงานที่สั่ง</a></li>
 		<li class="{{$active[5]}}"><a href="{{ url('/teacher/absentletter') }}">จัดการใบลา</a></li>
 		
 		

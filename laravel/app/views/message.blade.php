@@ -107,6 +107,7 @@
         });
   }
   function updateValElement(){
+   //condition={read:'1',unread:'1'};
     condition={read:$('#show_data_01').prop("checked")?'1':'0',unread:$('#show_data_02').prop("checked")?'1':'0'};
       $.get('{{ url("teacher/search_message/get_lastpage") }}',{condition:condition},function(data){
            lastpage=data;

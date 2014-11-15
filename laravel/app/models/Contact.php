@@ -5,7 +5,8 @@
 		private $receiver;
 		private $anonymous;
 		private $group_id;
-		private $idsubtable;		
+		private $idsubtable;
+		private $notification;		
 		public function __construct() {
    			$this->id=NULL;
 			$this->sender=NULL;
@@ -13,6 +14,7 @@
 			$this->anonymous=NULL;
 			$this->group_id=NULL;
 			$this->idsubtable=NULL;
+			$this->notification=NULL;
     	}
     	public function cloneContact(Contact $contact){	
 			if($contact!=NULL){
@@ -22,6 +24,7 @@
 				$this->anonymous=$contact->getAnonymous();
 				$this->group_id=$contact->getGroupid();
 				$this->idsubtable=$contact->getIdsubtable();
+				$this->notification=$contact->getNotification();
 			}
 		}
 		public static function getMaxId(){
@@ -44,6 +47,7 @@
 				$obj->setAnonymous($dataTmp->anonymous);
 				$obj->setGroupid($dataTmp->group_id);
 				$obj->setIdsubtable($dataTmp->idsubtable);
+				$obj->setNotification($dataTmp->notification);
 				return $obj;
 			}
 			else{
@@ -87,7 +91,7 @@
 			$dataTmp = ContactRepository::find($this->id);
 			if($dataTmp!=NULL){
 				DB::table('contact')->where('ID', '=',$this->id)->update(array('sender' => $this->sender
-					,'receiver' => $this->receiver,'anonymous' => $this->anonymous,'group_id' => $this->group_id,'idsubtable' => $this->idsubtable));
+					,'receiver' => $this->receiver,'anonymous' => $this->anonymous,'group_id' => $this->group_id,'idsubtable' => $this->idsubtable,'notification' => $this->notification));
 				return true;
 			}
 			else{
@@ -131,13 +135,20 @@
 		public function getIdsubtable(){
 			return $this->idsubtable;
 		}
+		public function setNotification($data){
+			$this->notification = $data;
+		}
+		public function getNotification(){
+			return $this->notification;
+		}
 		public function toString(){
 			return 'id = ' . $this->id.'<br>'.
 			'sender = ' . $this->sender.'<br>'.
 			'receiver = ' . $this->receiver.'<br>'.
 			'anonymous = ' . $this->anonymous.'<br>'.
 			'group_id = ' . $this->group_id.'<br>'.
-			'idsubtable = ' . $this->idsubtable.'<br>';
+			'idsubtable = ' . $this->idsubtable.'<br>'.
+			'notification = ' . $this->notification.'<br>';
 		}
 		public function addContact(Contact $contact){
 			$dataTmp = ContactRepository::where('ID','=',$contact->getID())->get();
@@ -149,6 +160,7 @@
 				$dataTmp->anonymous = $contact->getAnonymous();
 				$dataTmp->group_id = $contact->getGroupid();
 				$dataTmp->idsubtable = $contact->getIdsubtable();
+				$dataTmp->notification = $contact->getNotification();
 				$dataTmp->save();	
 			}						
 		}

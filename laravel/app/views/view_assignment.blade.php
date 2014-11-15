@@ -23,7 +23,7 @@
           <div class="panel-heading">รายละเอียด</div>
           <div class="panel-body">
 			<div class="form-group">
-			 <label class="col-sm-2 control-label">วันที่</label>
+			 <label class="col-sm-2 control-label">กำหนดส่งงาน</label>
 				<div class="col-sm-4">
 				  <input type="text" class="form-control" disabled value="{{ $date}}">
 				</div>
@@ -43,19 +43,13 @@
 				<div class="col-sm-10">
 				  <textarea rows="4" style="resize: vertical" class="form-control" disabled placeholder="{{ $ass->getDetail() }}"></textarea>
 				</div>
-			</div>	
-			<div class="form-group">
-			 <label class="col-sm-2 control-label" for="exampleInputFile">เอกสาร</label>
-				<div class="col-sm-10">
-				  <input type="file" class="form-control" disabled value="">
-				</div>
-			</div>   
+			</div>	  
           </div>
         </div>
       </div>
 	<div class="line_col12 col-sm-12"></div>
 	 <div class="col-lg-12 text-center">
-	  <button type="button" class="btn btn-primary" onclick="history.back();"><span class="glyphicon glyphicon-circle-arrow-left" ></span> ย้อนกลับไปหน้าก่อนหน้า</button>
+	  <button type="button" class="btn btn-primary" onclick="location.href='{{url('/teacher/assignment')}}'"><span class="glyphicon glyphicon-circle-arrow-left" ></span> ย้อนกลับไปหน้าก่อนหน้า</button>
 	 <!--- <button type="button" class="btn btn-success" onclick="location.href='send_assignment.php'"><span class="glyphicon glyphicon-send " ></span> ส่งงาน</button>--->
      </div>
 	<div class="line_col12 col-sm-12"></div>

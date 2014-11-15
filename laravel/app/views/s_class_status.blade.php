@@ -1,4 +1,4 @@
-@extends('header_teacher')
+@extends('header_student')
 
 @section('body')
 
@@ -16,7 +16,7 @@
           <tr>
             <th width= "5%">ข้อที่ </th>
 			<th>สถานะ</th>
-            <th>จำนวนคน</th>
+            <th width= "8%"></th>
           </tr>
         </thead>
 		<tbody>
@@ -27,7 +27,7 @@
 					echo '<tr>';
 						echo '<td>'.$i.'</td>';
 						echo '<td>'.$key.'</td>';
-						echo '<td>'.$data.'</td>';			 
+                              echo '<td><button type="submit" class="btn btn-success" id="submit" onclick="location.href=\' '.url("student/set_class_assess/".$id."/".($i-1)).' \'">เลือกสถานะ</button> </td>'; 
 					echo '</tr>';
 					 $i++;
 				}

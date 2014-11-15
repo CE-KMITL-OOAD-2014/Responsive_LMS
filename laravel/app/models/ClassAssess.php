@@ -85,6 +85,39 @@
 			}
 			return $result;
 		}
+		public function update(){
+			var_dump($this->getScore());
+			var_dump($this->getId_student());
+			
+		 	 for($i=0;$i<count($this->getId_student());$i++){
+				$n=ClassAssessRepository::where('id_study','=',$this->getId_study())
+					->where('id_student','=',$this->getId_student()[$i])->count();
+					echo($n);
+				if($n>0){
+					for($j=0;$j<count($this->getScore()[$i]);$j++){
+						DB::table('class_assess')->where('id_study', '=',$this->getId_study())
+							->where('id_student','=',$this->getId_student()[$i])
+							->where('id_assess','=',$j)->
+						update(array(
+							'score' => $this->getScore()[$i][$j]
+						));
+					}
+				}
+				else{
+					for($j=0;$j<count($this->getScore()[$i]);$j++){
+						$tmp = new ClassAssessRepository;
+						$tmp->ID = ClassAssess::getMaxId()+1;
+						$tmp->id_study = $this->getId_study();
+						$tmp->score = $this->getScore()[$i][$j];
+						$tmp->id_assess= $j;
+						$tmp->id_student = $this->getId_student()[$i];
+						$tmp->save();
+					}
+				}
+			}	
+			
+			
+		}
 		public function setId_study($data){
 			$this->id_study = $data;
 		}

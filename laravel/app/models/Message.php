@@ -25,6 +25,11 @@ class Message extends Contact{
 				$this->created_at=$message->getCreated_at();
 			}
 	    }
+		public static function cloneFromContact(Contact $contact){
+			$obj = new Message;
+			$obj->cloneContact($contact);
+			return $obj;
+		} 
 		public static function getMaxId(){
 	    	$maxid= MessageRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -126,22 +131,23 @@ class Message extends Contact{
 
 		}
 		public static function getFromId($id){
-			$dataTmp = MessageRepository::find($id);
-			$obj = new Message;
+			$conTmp = Contact::getFromId($id);
+			if($conTmp!=NULL){
+				$dataTmp = MessageRepository::find($conTmp->getIdsubtable());
+				$obj = new Message;
+				if($dataTmp!=NULL){
+					$obj = Message::cloneFromContact($conTmp);
+					$obj->setID($dataTmp->ID);
+					$obj->setTitle($dataTmp->title);
+					$obj->setMessage($dataTmp->message);
+					$obj->setStatus($dataTmp->status);
+					$obj->setDetail_delete($dataTmp->detail_delete);
+					$obj->setCreated_at($dataTmp->created_at);
+					return $obj;
+				}
+			}
+			return NULL;
 			
-			if($dataTmp!=NULL){
-				$obj->setID($dataTmp->ID);
-				$obj->setTitle($dataTmp->title);
-				$obj->setMessage($dataTmp->message);
-				$obj->setStatus($dataTmp->status);
-				$obj->setDetail_delete($dataTmp->detail_delete);
-				$obj->setCreated_at($dataTmp->created_at);
-				return $obj;
-			}
-			else{
-				return NULL;
-			}
-
 		}
 		public function update(){
 			$dataTmp = MessageRepository::find($this->id);
@@ -192,7 +198,7 @@ class Message extends Contact{
 			return $this->created_at;
 		}
 		public function toString(){
-			return 
+			return parent::toString().
 					'id = '.$this->id.'<br>'.
 					'title = '.$this->title.'<br>'.
 					'message = '.$this->message.'<br>'.

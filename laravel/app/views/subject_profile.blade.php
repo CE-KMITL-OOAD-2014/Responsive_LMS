@@ -1,17 +1,7 @@
 @extends('header_teacher')
 
 @section('body')
-<?php
-	$id_subj=unserialize(Cookie::get('subject',null));
-	if($id_subj!=null){
-		$tmp= Subject::getFromID($id_subj);
-	}
-	echo $tmp->toString();
-	
-	//echo $tmp->$studentsTmp[0]->{'id_student'};
-	//echo "<br>";
-	//echo $tmp->getStudents();
-?>
+
 
 <!-- Wrap all page content here -->
 <div id="wrap"> 
