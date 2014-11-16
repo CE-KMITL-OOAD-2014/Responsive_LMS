@@ -44,11 +44,13 @@ class Absent extends Contact{
 				$this->created_at=$absentletter->getCreated_at();
 			}
 	    }
+		//copy constructor
 		public static function cloneFromContact(Contact $contact){
 			$obj = new Absent;
 			$obj->cloneContact($contact);
 			return $obj;
 		}
+		//get maximum column 'id'
 		public static function getMaxId(){
 	    	$maxid= AbsentLetterRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -59,6 +61,7 @@ class Absent extends Contact{
 					return $maxid->ID;
 			}
 		}
+		//get maximum column 'id' ของ file
 		public static function getMaxFileID(){
 			$maxid= FileRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -69,7 +72,9 @@ class Absent extends Contact{
 					return $maxid->ID;
 			}
 		}
+		//get หน้าสุดท้ายที่ใช้สำหรับแสดงผล
 		public static function getLastpage($condition,$id_user,$id_subj){
+			//เช็คสถานะในการค้นหา 
 			if($condition['approve'] =='1'){
 				if($condition['Pending'] == '1' && $condition['unapprove'] == '1'){
 						$table = DB::table('contact')
@@ -139,7 +144,9 @@ class Absent extends Contact{
 			
 			return  max(ceil($table/Absent::ROWPERPAGE),1);
 		}
+		//get จำนวนทั้งหมดของใบลา
 		public static function getCount($condition,$id_user,$id_subj){
+			//เช็คสถานะในการค้นหา 
 			if($condition['approve'] =='1'){
 				if($condition['Pending'] == '1' && $condition['unapprove'] == '1'){
 						$table = DB::table('contact')
@@ -208,7 +215,9 @@ class Absent extends Contact{
 			}
 			return  $table;
 		}
+		//ค้นหาข้อมูลของใบลาตามเงื่อนไข
 		public static function search($condition,$currentPage,$id_user,$id_subj){
+			//เช็คสถานะในการค้นหา 
 			if($condition['approve'] =='1'){
 				if($condition['Pending'] == '1' && $condition['unapprove'] == '1'){
 						$table = DB::table('contact')
@@ -291,27 +300,7 @@ class Absent extends Contact{
             return $output;
 
 		}
-		/*
-		public static function getFromId($id){
-			$dataTmp = AbsentLetterRepository::find($id);
-			$obj = new Absent;
-			
-			if($dataTmp!=NULL){
-				$obj->setID($dataTmp->ID);
-				$obj->setDate_at($dataTmp->date_at);
-				$obj->setDetail($dataTmp->detail);
-				$obj->setStatus($dataTmp->status);
-				$obj->setDetail_delete($dataTmp->detail_delete);
-				$obj->setStatus_read($dataTmp->status_read);
-				$obj->setId_subject($dataTmp->id_subject);
-				$obj->setId_doc($dataTmp->id_doc);
-				$obj->setCreated_at($dataTmp->created_at);			
-				return $obj;
-			}
-			else{
-				return NULL;
-			}
-		}*/
+		//get this object ด้วย id ของ contact แล้วใช้ idsubtable ในการค้นหาใบลาด้วย id 
 		public static function getFromId($id){
 			$conTmp = Contact::getFromId($id);
 			if($conTmp!=NULL){
@@ -328,6 +317,7 @@ class Absent extends Contact{
 					$obj->setId_subject($dataTmp->id_subject);
 					$obj->setId_doc($dataTmp->id_doc);
 					$obj->setName_file($fileTmp->name);
+					//ค้นหาเอกสาร
 					if($dataTmp->id_doc!='0'){
 						$connectionString = "DefaultEndpointsProtocol=http;AccountName=rpslmssr;AccountKey=NJ7zmjCLPbw6n7ySPWZRQ0EgR48jjzolffMpMApBVPl2yYfOqgfz0To4C57/lAACSrGL/1AElzeIuwbc6lJNTA==";
 						$blobRestProxy = ServicesBuilder::getInstance()->createBlobService($connectionString);
@@ -360,6 +350,7 @@ class Absent extends Contact{
 			return NULL;
 			
 		}
+		//download file
 		public function downloadFile(){
 			$file = $this->getContent_file();
 			$contents = stream_get_contents($file);
@@ -368,6 +359,7 @@ class Absent extends Contact{
 			echo  $contents;
 
 		}
+		//อัพเดท
 		public function update(){
 			$dataTmp = AbsentLetterRepository::find($this->getIdsubtable());
 			if($dataTmp!=NULL){
@@ -379,7 +371,9 @@ class Absent extends Contact{
 			}
 
 		}
+		//get หน้าสุดท้ายที่ใช้สำหรับแสดงผล สำหรับนักศึกษา
 		public static function getLastpage_s($condition,$id_user,$id_subj){
+			//เช็คสถานะในการค้นหา 
 			if($condition['approve'] =='1'){
 				if($condition['Pending'] == '1' && $condition['unapprove'] == '1'){
 						$table = DB::table('contact')
@@ -415,6 +409,7 @@ class Absent extends Contact{
             				->where('contact.sender','=',$id_user)->count();
 				}
 			}
+			//get จำนวนทั้งหมดของใบลา สำหรับนักศึกษา
 			else if($condition['Pending'] =='1'){
 				if($condition['unapprove'] == '1'){
 						$table = DB::table('contact')
@@ -449,7 +444,9 @@ class Absent extends Contact{
 			
 			return  max(ceil($table/Absent::ROWPERPAGE),1);
 		}
+		//ค้นหาข้อมูลของใบลาตามเงื่อนไขสำหรับนักศึกษา
 		public static function getCount_s($condition,$id_user,$id_subj){
+			//เช็คสถานะในการค้นหา 
 			if($condition['approve'] =='1'){
 				if($condition['Pending'] == '1' && $condition['unapprove'] == '1'){
 						$table = DB::table('contact')
@@ -519,6 +516,7 @@ class Absent extends Contact{
 			return  $table;
 		}
 		public static function search_s($condition,$currentPage,$id_user,$id_subj){
+			//เช็คสถานะในการค้นหา 
 			if($condition['approve'] =='1'){
 				if($condition['Pending'] == '1' && $condition['unapprove'] == '1'){
 						$table = DB::table('contact')

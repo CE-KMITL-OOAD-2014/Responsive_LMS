@@ -152,7 +152,7 @@ Route::get('/teacher/action_unapprove/{id}','TeacherController@actionUnApprove' 
 Route::get('/teacher/search_submit_assignment/{method}','TeacherController@searchSubmitAssignment' );
 Route::get('/teacher/view_submit_assignment/{id}','TeacherController@viewSubmitAssignment' );
 Route::post('/teacher/edit_submit_assignment','TeacherController@editSubmitAssignment');
-
+Route::get('/student/s_score','StudentController@score' );
 Route::get('/student/s_class_status/{id}','StudentController@setClassStatus');
 Route::get('/student/s_class_assess/{id}','StudentController@setClassAssess');
 Route::get('student/set_class_status/{id}/{i}','StudentController@setClassStatusAction');
@@ -170,4 +170,3 @@ Route::post('/student/add_absentletter','StudentController@addAbsentletter' );
 Route::get('/student/view_add_submit_assignment/{id}','StudentController@viewAddSubmitAssignment' );
 Route::post('/student/add_submit_assignment','StudentController@addSubmitAssignment' );
 Route::get('/student/search_absentletter/{method}','StudentController@searchAbsentletter' );
-Route::get('/student/s_score','StudentController@score' );

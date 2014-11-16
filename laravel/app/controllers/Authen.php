@@ -31,7 +31,7 @@ class Authen extends BaseController {
 			return Redirect::to('/student');
 		}
 
-	//phpinfo();
+	//แสดงผลหน้า login
 	}
 	public function showLogin(){
 		if(Cookie::get('user',null)!=null){
@@ -39,10 +39,12 @@ class Authen extends BaseController {
 		}
 		return View::make('login');
 	}
+	//ประมวลผลส่วนลงชื่อออก
 	public function logout(){
 		$cookie=Cookie::forget('user');
 		return Redirect::to('/')->withCookie($cookie);
 	}
+	//ประมวลผลการลงชื่อเข้าใช้
 	public function actionlogin(){
 		$user_id=Input::get('user_id');
 		$user_password=md5(Input::get('user_password'));
@@ -78,6 +80,7 @@ class Authen extends BaseController {
 
 		return Redirect::to('/');
 	}
+	//update ข้อมูล cookie ผู้ใช้งานจาก DB
 	public static function refresh(){
 		$tmp=unserialize(Cookie::get('user',null));
 		if($tmp!=NULL){

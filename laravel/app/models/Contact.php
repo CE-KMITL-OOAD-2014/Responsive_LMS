@@ -16,6 +16,7 @@
 			$this->idsubtable=NULL;
 			$this->notification=NULL;
     	}
+		//copy constructor
     	public function cloneContact(Contact $contact){	
 			if($contact!=NULL){
 				$this->id=$contact->getID();
@@ -27,6 +28,7 @@
 				$this->notification=$contact->getNotification();
 			}
 		}
+		//get maximum column 'id'
 		public static function getMaxId(){
 			$maxid= ContactRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -36,6 +38,7 @@
 				return $maxid->ID;
 			}
 		}
+		//get this object by specify id
 		public static function getFromId($id){
 			$dataTmp = ContactRepository::find($id);
 			$obj = new Contact;
@@ -55,38 +58,6 @@
 			}
 
 		}
-		/*public static function getFromSubtable($group_id,$idsubtable){
-			$dataTmp = ContactRepository::where('group_id','=',$group_id)->where('id_subtable','=',$idsubtable)->get();
-			$obj = new Contact;
-			
-			$students=array();
-				$studentsTmp = SubjectStudentRelationshipRepository::where('id_subject','=',$dataTmp->ID)->where('status_del','=','0')->get();
-				for($i=0;$i<count($studentsTmp);$i++){
-					$students[$i]=Student::getFromID($studentsTmp[$i]->{'id_student'});
-					//$students[$i]=$studentsTmp[$i]->{'id_student'};
-				}
-				$obj->setStudents($students);
-			
-			if($dataTmp!=NULL){
-				for($i=0;$i<count($dataTmp);$i++){
-					$obj->setID($dataTmp->ID);
-					$sender=array();
-					for($i=0;$i<count($studentsTmp);$i++){
-						$sender[$i]=getFromID($studentsTmp[$i]->{'id_student'});
-					}
-					$obj->setStudents($students);
-					$obj->setReceiver($dataTmp->receiver);
-					$obj->setAnonymous($dataTmp->anonymous);
-					$obj->setGroupid($dataTmp->group_id);
-					$obj->setIdsubtable($dataTmp->idsubtable);
-					return $obj;
-				}
-			}
-			else{
-				return NULL;
-			}
-
-		}*/
 		public function update(){
 			$dataTmp = ContactRepository::find($this->id);
 			if($dataTmp!=NULL){

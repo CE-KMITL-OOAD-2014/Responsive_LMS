@@ -13,6 +13,7 @@
 			$this->detail=NULL;
 			$this->notification=NULL;
     	}
+    	//copy constructor
     	public function cloneStudy(Study $study){	
 			if($study!=NULL){
 				$this->id=$study->getID();
@@ -31,6 +32,7 @@
 				return $maxid->ID;
 			}
 		}
+		//รับค่าข้อมูลห้องเรียนจากฐานข้อมูลโดยระบุ id
 		public static function getFromId($id){
 			$dataTmp = StudyRepository::find($id);
 			$obj = new Study;
@@ -48,14 +50,17 @@
 			}
 
 		}
+		//อ่านค่าจำนวนหน้าทั้งหมดสำหรับหน้าแสดงผล
 		public static function getLastpage($id_subj){
 			$table = DB::table('study')->where('id_subject','=',$id_subj)->count();
 			return  max(ceil($table/Study::ROWPERPAGE),1);
 		}
+		//อ่านค่าจำนวนข้อมูลทั้งหมดสำหรับหน้าแสดงผล
 		public static function getCount($id_subj){
 			$table = DB::table('study')->where('id_subject','=',$id_subj)->count();
 			return  $table;
 		}
+		//ค้นหาข้อมูลทั้งหมดสำหรับหน้าแสดงผล
 		public static function search($currentPage,$id_subj){
 			$table = DB::table('study')->where('id_subject','=',$id_subj)->orderBy('ID', 'DESC')->get();
            	$i = ($currentPage-1)* Study::ROWPERPAGE;

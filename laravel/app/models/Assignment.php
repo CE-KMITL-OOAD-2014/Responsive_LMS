@@ -32,11 +32,13 @@ class Assignment extends Contact{
 				
 			}
 	    }
+		//copy constructor
 		public static function cloneFromContact(Contact $contact){
 			$obj = new Assignment;
 			$obj->cloneContact($contact);
 			return $obj;
 		} 
+		//get maximum column 'id'
 		public static function getMaxId(){
 	    	$maxid= AssignmentRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -47,6 +49,7 @@ class Assignment extends Contact{
 					return $maxid->ID;
 			}
 		}
+		//get หน้าสุดท้ายที่ใช้สำหรับแสดงผล
 		public static function getLastpage($condition,$id_subj){
 			$table = DB::table('assignment')->where(function($query) use($condition) {
               $query->where('id_assignment','like','%'.$condition['word'].'%')
@@ -54,6 +57,7 @@ class Assignment extends Contact{
             })->where('id_subject','=',$id_subj)->count();
 			return  max(ceil($table/Assignment::ROWPERPAGE),1);
 		}
+		//get จำนวนทั้งหมดของงานที่สั่ง
 		public static function getCount($condition,$id_subj){
 			$table = DB::table('assignment')->where(function($query) use($condition) {
                 $query->where('id_assignment','like','%'.$condition['word'].'%')
@@ -61,11 +65,16 @@ class Assignment extends Contact{
             })->where('id_subject','=',$id_subj)->count();
 			return  $table;
 		}
+		//ค้นหาข้อมูลของงานที่สั่งตามเงื่อนไข
 		public static function search($condition,$currentPage,$id_subj){
-			$table = DB::table('assignment')->where(function($query) use($condition) {
-                $query->where('id_assignment','like','%'.$condition['word'].'%')
-                 ->orWhere('title','like','%'.$condition['word'].'%');
-            })->where('id_subject','=',$id_subj)->get();
+			$table = DB::table('assignment')
+				->join('contact', 'contact.idsubtable','=','assignment.ID' )
+				->where(function($query) use($condition) {
+                $query->where('assignment.id_assignment','like','%'.$condition['word'].'%')
+                ->orWhere('assignment.title','like','%'.$condition['word'].'%');
+            })->where('contact.group_id','=','assignment')
+			->where('assignment.id_subject','=',$id_subj)->get(array('contact.ID','assignment.date_at','contact.notification'
+				,'assignment.id_assignment','assignment.title','contact.idsubtable'));
            	$i = ($currentPage-1)* Assignment::ROWPERPAGE;
             $j = $i+min(Assignment::ROWPERPAGE,count($table)-$i);
             $output=array();
@@ -76,35 +85,18 @@ class Assignment extends Contact{
 
 		}
 		public static function getLastpage_s($condition,$id_subj,$id_user){
-			$table = DB::table('assignment')
-				->join('contact', 'contact.idsubtable','=','assignment.ID' )
-				->where(function($query) use($condition) {
-                $query->where('assignment.id_assignment','like','%'.$condition['word'].'%')
-                ->orWhere('assignment.title','like','%'.$condition['word'].'%');
-            })->where('contact.group_id','=','assignment')
-			->where('contact.receiver','=',$id_user)
-			->where('assignment.id_subject','=',$id_subj)->count();
+			$table = DB::table('assignment')->where(function($query) use($condition) {
+                $query->where('id_assignment','like','%'.$condition['word'].'%')
+                 ->orWhere('title','like','%'.$condition['word'].'%');
+            })->where('id_subject','=',$id_subj)->count();
 			return  max(ceil($table/Assignment::ROWPERPAGE),1);
 		}
 		public static function getCount_s($condition,$id_subj,$id_user){
-			$table = DB::table('assignment')
-				->join('contact', 'contact.idsubtable','=','assignment.ID' )
-				->where(function($query) use($condition) {
-                $query->where('assignment.id_assignment','like','%'.$condition['word'].'%')
-                ->orWhere('assignment.title','like','%'.$condition['word'].'%');
-            })->where('contact.group_id','=','assignment')
-			->where('contact.receiver','=',$id_user)
-			->where('assignment.id_subject','=',$id_subj)->get();
-			$j=2;
-			for($i=0;$i<count($table);$i++){
-				if($i==0){
-					$j++;
-				}
-            	if($table[$i-1]->{'idsubtable'}!=$table[$i]->{'idsubtable'}){
-					$j++;
-				}
-            }
-			return  $j;
+			$table = DB::table('assignment')->where(function($query) use($condition) {
+                $query->where('id_assignment','like','%'.$condition['word'].'%')
+                 ->orWhere('title','like','%'.$condition['word'].'%');
+            })->where('id_subject','=',$id_subj)->count();
+			return  $table;
 		}
 		public static function search_s($condition,$currentPage,$id_subj,$id_user){
 			$table = DB::table('assignment')
@@ -114,7 +106,8 @@ class Assignment extends Contact{
                 ->orWhere('assignment.title','like','%'.$condition['word'].'%');
             })->where('contact.group_id','=','assignment')
 			->where('contact.receiver','=',$id_user)
-			->where('assignment.id_subject','=',$id_subj)->get();
+			->where('assignment.id_subject','=',$id_subj)->get(array('contact.ID','assignment.date_at','contact.notification'
+				,'assignment.id_assignment','assignment.title','contact.idsubtable'));
            	$i = ($currentPage-1)* Assignment::ROWPERPAGE;
             $j = $i+min(Assignment::ROWPERPAGE,count($table)-$i);
             $output=array();
@@ -124,6 +117,7 @@ class Assignment extends Contact{
             return $output;
 
 		}
+		//get this object ด้วย id ของ contact แล้วใช้ idsubtable ในการค้นหางานที่สั่งด้วย id 
 		public static function getFromId($id){
 			$conTmp = Contact::getFromId($id);
 			if($conTmp!=NULL){
@@ -145,6 +139,7 @@ class Assignment extends Contact{
 			return NULL;
 			
 		}
+
 		public function update(){
 				parent::update();
 				$dataTmp = AssignmentRepository::where('ID','=',$this->getID())->get();

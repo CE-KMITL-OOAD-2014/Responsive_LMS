@@ -1,10 +1,11 @@
 <?php
 
 	class TeacherController extends BaseController {
+		//แสดงหน้าหลักเวลาloginเสร็จเรียบร้อย
 		public function showHome(){
-			Authen::refresh();
+			Authen::refresh();//update cookie ผู้ใช้งานจาก DB
 			$tmp=unserialize(Cookie::get('user',null));
-			if(!Teacher::userIsTeacher($tmp)){
+			if(!Teacher::userIsTeacher($tmp)){//ตรวจสอบสิทธิ์ผู้ใช้งาน
 				return Redirect::to('/');
 			}
 			$subjecttmp = array();
@@ -14,6 +15,7 @@
 			$data['subjecttmp']=$subjecttmp;
 			return View::make('teacher',$data)->with('active', array('active','','','','','','','',''));
 		}
+		//แสดงหน้าviewจากการกดเมนูต่างๆเช่นเมนูบน header
 		public function showPage($page){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -49,17 +51,9 @@
 			else if( $page=='absentletter' || $page=='add_absentletter' ){
 				$active = array('','','','','','active','','','');
 			}
-			/*else if( $page==''){
-				$active = array('','','','','','','active','','');
-			}
-			else if( $page==''){
-				$active = array('','','','','','','','active','');
-			}
-			else if( $page==''){
-				$active = array('','','','','','','','','active');
-			}*/
 			return View::make($page,$data)->with('active', $active);
 		}
+		//กำหนดวิชาที่จะทำรายการก่อนทำรายการอื่นๆ
 		public function actionLMS(){
 			$subject_id=Input::get('subject');
 			$subject_tmp = Subject::getFromID($subject_id);
@@ -70,6 +64,7 @@
 			
 			return Redirect::to('teacher/subject_profile');
 		}
+		//แก้ไขข้อมูลรายวิชา
 		public function teacherEdit(){
 			$detail_thai=Input::get('detail_thai');
 			$detail_eng=Input::get('detail_eng');
@@ -80,8 +75,9 @@
 			$subj->setDetail_thai($detail_thai);
 			$subj->setDetail_eng($detail_eng);
 			$subj->update();
-		return Redirect::to('teacher/subject_profile');
+			return Redirect::to('teacher/subject_profile');
 		}
+		//ค้นหางานออกมาแสดงผลในรูปของตาราง
 		public function searchAssignment($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -105,7 +101,8 @@
 
 							$date_at = $day."-".$month."-".$year;
 					  }
-	    			  $output.= '<tr>   
+	    			  					  if($i==0){
+						$output.= '<tr  >
 	    			 			    <td>'.$date_at.'</td>   
 								 	<td>'.$table_assignment[$i]->{'id_assignment'}.'</td>
 						            <td>'.$table_assignment[$i]->{'title'}.'</td>    									
@@ -117,7 +114,21 @@
 							               </ul>
 							             </div></td>
 							        </tr>    ';
-				}
+					  }					  
+					  else if($table_assignment[$i-1]->{'idsubtable'}!=$table_assignment[$i]->{'idsubtable'}){
+						$output.= '<tr  >   
+	    			 			    <td>'.$date_at.'</td>   
+								 	<td>'.$table_assignment[$i]->{'id_assignment'}.'</td>
+						            <td>'.$table_assignment[$i]->{'title'}.'</td>    									
+									<td><div class="btn-group">
+						             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">ดำเนินการ <span class="caret"></span> </button>
+						                <ul class="dropdown-menu pull-right" role="menu">
+						  	               <li><a href="'.url('/teacher/view_assignment/'.$table_assignment[$i]->{'ID'}).'">ดูรายละเอียด</a></li>
+						  	               <li><a href="'.url('/teacher/submit_assignment/'.$table_assignment[$i]->{'ID'}).'">ดูงานที่ส่ง</a></li>
+							               </ul>
+							             </div></td>
+							        </tr>    ';
+					  }						}
 				return $output;
 			}
 			if($method=='get_lastpage'){
@@ -131,6 +142,7 @@
 				return Assignment::getCount($condition,$id_subj);
 			}
 		}
+		//แก้ไขข้อมูลรหัสผ่านของตนเอง
 		public function userEdit(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -143,6 +155,7 @@
 			return Redirect::to('/');
 
 		}
+		//แก้ไขข้อมูลส่วนตัวอื่นๆ
 		public function userWaitting(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -163,6 +176,7 @@
 			return Redirect::to('/');
 
 		}
+		//คนหา Class เรียนที่เปิดหรือเปลี่ยนแปลงเวลาเรียนแล้ว
 		public function searchStudy($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -174,7 +188,7 @@
 			if($method=='search'){
 				$table_study = Study::search($currentPage,$id_subj);
 				$output = '';
-				for ($i=0;$i<count($table_study);$i++) {
+				for ($i=0;$i<count($table_study);$i++) {//จัดรูปแบบให้อยู่ในรูปของตาราง
 					  $date_at=$table_study[$i]->{'date_at'};
 					  if($date_at!=''){
 							$year = substr($date_at, 0, 4);
@@ -182,7 +196,7 @@
 							$month = substr($date_at, 5, 2);
 							$day = substr($date_at, 8, 2);
 
-							$date_at = $day."-".$month."-".$year;
+							$date_at = $day."-".$month."-".$year;//จัดการรูปแบบวันที่
 					  }
 	    			  $output.= '<tr>   
 	    			 			    <td>'.$date_at.'</td>   
@@ -207,6 +221,7 @@
 				return Study::getCount($id_subj);
 			}
 		}
+		//ค้นหาข้อความที่นักเรียนส่งมา
 		public function searchMessage($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -258,6 +273,7 @@
 				return Message::getCount($condition,$id_user);
 			}
 		}
+		//ค้นหาใบมาที่นักเรียนส่งมา
 		public function searchAbsentletter($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -269,10 +285,6 @@
 			//$id_user='12';
 			$condition = Input::get('condition');
 			$currentPage = Input::get('currentPage');
-			//$condition['approve'] ='1';
-			//$condition['Pending'] = '1';
-			//$condition['unapprove'] ='1';
-			//$currentPage ='1';
 			if($method=='search'){
 				$table_absent = Absent::search($condition,$currentPage,$id_user,$id_subj);
 				$output = '';
@@ -320,16 +332,15 @@
 				return $output;
 			}
 			if($method=='get_lastpage'){
-				//return 'get_lastpage';
 				$condition = Input::get('condition');
 				return Absent::getLastpage($condition,$id_user,$id_subj);
 			}
 			if($method=='get_count'){
-				//return 'get_count';
 				$condition = Input::get('condition');
 				return Absent::getCount($condition,$id_user,$id_subj);
 			}
 		}
+		//คนหางานที่นักเรียนส่งมา
 		public function searchSubmitAssignment($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -349,7 +360,7 @@
 			if($method=='search'){
 				$table_submitassignment = SubmitAssignment::search($condition,$currentPage,$id_user);
 				$output = '';
-				//return json_encode($table_submitassignment);
+				//var_dump($table_submitassignment);
 				for ($i=0;$i<count($table_submitassignment);$i++) {
 					  $date_at=$table_submitassignment[$i]->{'created_at'};
 					  if($date_at!=''){
@@ -391,6 +402,7 @@
 				return SubmitAssignment::getCount($condition,$id_user);
 			}
 		}
+		//เปิดดูรายละเอียดต่างๆของงานที่สั่ง
 		public function viewAssignment($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -404,6 +416,7 @@
 			}
 			return Redirect::to('/');
 		}	
+		//เปิดดูรายละเอียดของงานที่นักเรียนส่ง
 		public function viewSubmitAssignment($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -418,15 +431,17 @@
 			}
 			return Redirect::to('/');
 		}
+		//Download เอกสารแนบจากงาน
 		public function downloadFileAssignment($id){
 			$smaTmp = SubmitAssignment::getFromID($id);
 			$smaTmp->downloadFile();
 		}
+		//Download เอกสารแนบจากใบลา
 		public function downloadFileAbsent($id){
 			$absTmp = Absent::getFromID($id);
 			$absTmp->downloadFile();
 		}
-		
+		//สั่งงานนักศึกษาโดยกรอกแบบฟอร์มรายละเอียด
 		public function addAssignment(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -443,7 +458,6 @@
 			$input->setId_subject($id_subj);
 			$input->setDate_at(Input::get('date_at'));
 			$id_subtable=$subj->addAssignment($input);
-			
 			$subject= Subject::getFromID($id_subj);
 			for($i=0;$i<count($subject->getTeachers());$i++){
 				for($j=0;$j<count($subject->getStudents());$j++){
@@ -461,6 +475,7 @@
 			
 			return Redirect::to('teacher/assignment');
 		}
+		//เพิ่มคลาสเรียนในวิชากำหนดวันเวลาตามแบบฟอร์ม
 		public function addStudy(){
 				Authen::refresh();
 				$tmp=unserialize(Cookie::get('user',null));
@@ -480,13 +495,14 @@
 				$subj->addStudy($subjectTmp);
 				return Redirect::to('/teacher/study');
 		}
+		//แสดงรายละเอียดงานของนักเรียน
 		public function submitAssignment($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
 			if(!Teacher::userIsTeacher($tmp)){
 				return Redirect::to('/');
 			}
-			$assInput = SubmitAssignment::getFromId($id);
+			$assInput = Assignment::getFromId($id);
 			$header['active']=array('','','','','active','','','','');
 			if($assInput!=NULL){
 				return View::make('submit_assignment',$header)->with('ass', $assInput);
@@ -494,6 +510,7 @@
 			return Redirect::to('/');
 			
 		}
+		//ดูรายละเอียดสถานะขณะเียนของคลาส
 		public function viewClassStatus($id){
 			$cstatusTmp=ClassStatus::getFromIDStudy($id);
 			if($cstatusTmp!=NULL){
@@ -506,6 +523,7 @@
 			return View::make('class_status',$header)->with('result', $result);
 			var_dump($result);
 		}
+		//ดูผลการประเมิณของคลาส
 		public function viewClassAssess($id){
 			$cassessTmp=ClassAssess::getFromIDStudy($id);
 			if($cassessTmp!=NULL){
@@ -518,6 +536,7 @@
 			return View::make('class_assess',$header)->with('result', $result);
 			var_dump($result);
 		}
+		//ให้คะแนนงาน
 		public function editSubmitAssignment(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -533,9 +552,9 @@
 				$input->setStatus_score("1");
 			}
 			$input->update();
-			return Redirect::to('teacher/submit_assignment/1');
+			return Redirect::to('teacher/assignment/');
 		}
-
+		//ส่งข้อความหานักเรียน
 		public function addMessage(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -578,6 +597,7 @@
 			
 			return Redirect::to('teacher/message');
 		}
+		//ดูรายละเอียดข้อความที่นักเรียนส่งมา
 		public function viewMessage($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -594,6 +614,7 @@
 			}
 			return Redirect::to('/');
 		}
+		//ดูรายละเอียดของใบลาที่นักเรียนส่งมา
 		public function viewAbsentletter($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -603,13 +624,13 @@
 			$absentInput = Absent::getFromId($id);
 			$absentInput->setStatus_read("1");
 			$absentInput->update();
-			//$conInput = Contact::getFromId($id);
 			$header['active']=array('','','','','','active','','','');
 			if($absentInput!=NULL){
 				return View::make('view_absentletter',$header)->with('absent', $absentInput);
 			}
 			return Redirect::to('/');
 		}
+		//อนุมัติใบลาของนักเรียน
 		public function actionApprove($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -621,6 +642,7 @@
 			$absentInput->update();
 			return Redirect::to('teacher/absentletter');
 		}		
+		//ไม่อนุมัติใบลา
 		public function actionUnApprove($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));

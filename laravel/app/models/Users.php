@@ -18,6 +18,7 @@
 			$this->email=NULL;
 			$this->status=NULL;
     	}
+    	//copy constructor
     	public function cloneUser(Users $user){	
 			if($user!=NULL){
 				$this->id=$user->getID();
@@ -30,6 +31,7 @@
 				$this->status=$user->getStatus();
 			}
 		}
+		//get maximum column 'id'
 		public static function getMaxId(){
 			$maxid= UsersRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -39,7 +41,7 @@
 				return $maxid->ID;
 			}
 		}
-
+		//get this object by specify id
 		public static function getFromId($id){
 			$dataTmp = UsersRepository::find($id);
 			$obj = new Users;
@@ -60,9 +62,11 @@
 			}
 
 		}
+		//get data record from userane password
 		protected static function  importFromUserPass($user,$pass){
 			return UsersRepository::where('username','=',$user)->where('password','=',$pass)->get();
 		}
+		//get this object by specify username password
 		public static function getFromUserPass($user,$pass){
 			$dataTmp = Users::importFromUserPass($user,$pass);
 			if(count($dataTmp)==1){
@@ -71,8 +75,7 @@
 			else{
 				return NULL;
 			}
-		}
-
+		} 
 		public function update(){
 			$dataTmp = UsersRepository::find($this->id);
 			if($dataTmp!=NULL){

@@ -41,6 +41,7 @@
 			$this->detail_delete=NULL;
 
 	    }
+	    //copy constructor
 	    public function copy(Subject $subj){
 	    	if($subj!=NULL){
 	    		$this->id=$subj->getID();
@@ -61,6 +62,7 @@
 
 			}
 	    }
+	    //หาค่าสูงสุดของ ID ในฐานข้อมูลวิชา
 	    public static function getMaxId(){
 	    	$maxid= SubjectRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -105,6 +107,7 @@
             return $output;
 
 		}
+		//อ่านค่าข้อมูลโดยระบุ id
 		public static function getFromId($id){
 			$dataTmp = SubjectRepository::find($id);
 			$obj = new Subject;
@@ -146,6 +149,7 @@
 		protected static function  importFromId_subject($id_subject){
 			return SubjectRepository::where('id_subject','=',$id_subject)->get();
 		}
+		//อ่านค่าข้อมูลโดยระบุ username password
 		public static function getFromId_subject($id_subject){
 			$dataTmp = Subject::importFromId_subject($id_subject);
 			if(count($dataTmp)==1){
@@ -178,6 +182,7 @@
 				}
 			return false;
 		}
+		//หาค่าสูงสุดของ ID ระหว่าง ฐานข้อมูลความสำพันธ์นักเรียน อาจารย์ วิชา
 		public static function getStudentRelationMaxId(){
 			$maxid= SubjectStudentRelationshipRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -198,6 +203,7 @@
 					return $maxid->ID;
 			}
 		}
+		//อัพเดทความสัมพันธ์ของอาจารย์กับวิชา
 		public function teacherUpdate(){
 			$subjectTeacher = SubjectTeacherRelationshipRepository::where('id_subject','=',$this->getID())->
 					where('status_del','=','0')->get();
@@ -226,6 +232,7 @@
 			}
 
 		}
+		//เพิ่ม Assignment ในวิชา
 		public function addAssignment(Assignment $assign){
 			$dataTmp = AssignmentRepository::where('ID','=',$assign->getID())->get();
 			if(count($dataTmp)==0){
@@ -245,6 +252,7 @@
 				return false;
 			}
 		}
+		//เพิ่มคลาสเรียนในวิชา
 		public function addStudy(Study $study){
 			$dataTmp = StudyRepository::where('ID','=',$study->getID())->get();
 			if(count($dataTmp)==0){
@@ -261,6 +269,7 @@
 				return false;
 			}
 		}
+		//เพิ่มข้อความสำหรับติดต่อในวิชา
 		public function addMessage(Message $message){
 			$dataTmp = MessageRepository::where('ID','=',$message->getID())->get();
 			if(count($dataTmp)==0){
@@ -277,6 +286,7 @@
 				return false;
 			}
 		}
+		//เพิ่มใบลาในวิชา
 		public function addAbsentletter(Absent $abl){
 			$dataTmp = AbsentLetterRepository::where('ID','=',$abl->getID())->get();
 			if(count($dataTmp)==0){
@@ -307,6 +317,7 @@
 						$error_message = $e->getMessage();
 						echo $code.": ".$error_message."<br />";
 					}
+					//end storage zone
 				}
 				else{
 					$dataTmp->id_doc = 0;
@@ -319,6 +330,7 @@
 				return false;
 			}
 		}
+		//เพิ่มงานที่ส่งในวิชา
 		public function addSubmitAssignment(SubmitAssignment $sma){
 			$dataTmp = SubmitAssignmentRepository::where('ID','=',$sma->getID())->get();
 			if(count($dataTmp)==0){
@@ -345,6 +357,7 @@
 						$error_message = $e->getMessage();
 						echo $code.": ".$error_message."<br />";
 					}
+					//end storage zone
 				}
 				else{
 					$dataTmp->id_doc = 0;
@@ -367,6 +380,7 @@
 					return $sma->getID();
 			}
 		}
+		//รับค่านักเรียนทั้งหมดที่เรียนในวิชา
 		public function getAllSubjectFromStudent(){
 			$allsubject = array();
 			for($i=0;$i<count($this->getStudents());$i++){
@@ -380,6 +394,7 @@
 			}
 			return $allObjectSubject;
 		}
+		//อัพเดทความสัมพันธ์ของนักเรียนกับวิชา
 		public function studentUpdate(){
 			$subjectStudent = SubjectStudentRelationshipRepository::where('id_subject','=',$this->getID())->
 					where('status_del','=','0')->get();
@@ -407,6 +422,7 @@
 				}
 			}
 		}
+		//อัพเดทสถานะคลาสเรียน
 		public function setClassStatus($id_student,$id,$i){
 			$tmp = ClassStatus::getFromIDStudy($id);
 			if($tmp!=NULL){
@@ -434,6 +450,7 @@
 
 
 		}
+		//อัพเดทผลการประเมินชั้นเรียน
 		public function setClassAssess($id_student,$id,$score){
 			$tmp = ClassAssess::getFromIDStudy($id);
 			if($tmp!=NULL){

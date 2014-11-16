@@ -13,7 +13,7 @@
   $i=0;
   $dateTmp = new DateTime(date("Y-m-d"));
   $dateTmp->modify("+".$dayTmp ." day");
-  $date_next = $dateTmp->format("d/m/Y");
+  $date_next = $dateTmp->format("m/d/Y");
 ?>
 
 <div id="wrap"> 
@@ -31,7 +31,7 @@
 			<div class="form-group">
 			 <label class="col-sm-2 control-label">วันที่ประกาศ</label>
 				<div class="col-sm-10">
-				  <input type="text" name="date_at" class="form-control mydate" value="{{date("d/m/Y");}}">
+				  <input type="text" name="date_at" class="form-control mydate" value="{{date("m/d/Y");}}">
 				</div>
 			</div>
 			<div class="form-group">
@@ -128,7 +128,7 @@ if(dayTmp<=0){
 var date = Date.parse('{{date("Y-m-d")}}');
 var date_next_tmp = date + dayTmp*23*60*60*1000;
 date_next_tmp = new Date(date_next_tmp);
-var date_next=date_next_tmp.getDate()+'/'+(date_next_tmp.getMonth()+1)+'/'+date_next_tmp. getFullYear();
+var date_next=(date_next_tmp.getMonth()+1)+'/'+date_next_tmp.getDate()+'/'+date_next_tmp. getFullYear();
 $('.move').hide();
 $('#detail').html('เรียนตามปกติ วัน{{$day[$subj->getDay()]}} ที่ {{$date_next}} เวลา {{substr($subj->getStart_at(),0,5);}} - {{substr($subj->getEnd_at(),0,5);}}');
 $('.change').click(function(){
@@ -139,7 +139,7 @@ $('.change').click(function(){
   }
   date_next_tmp = date + dayTmp*23*60*60*1000;
   date_next_tmp = new Date(date_next_tmp);
-  date_next=date_next_tmp.getDate()+'/'+(date_next_tmp.getMonth()+1)+'/'+date_next_tmp. getFullYear();
+  date_next=(date_next_tmp.getMonth()+1)+'/'+date_next_tmp.getDate()+'/'+date_next_tmp. getFullYear();
 	if($(this).val()=='0'){
 		$('.move').hide();
 		$('#detail').html('เรียนตามปกติ วัน {{$day[$subj->getDay()]}} ที่ {{ $date_next}} เวลา {{substr($subj->getStart_at(),0,5);}} - {{substr($subj->getEnd_at(),0,5);}}');
@@ -158,7 +158,7 @@ $('.edit').change(function(){
   }
   date_next_tmp = date + dayTmp*23*60*60*1000;
   date_next_tmp = new Date(date_next_tmp);
-  date_next=date_next_tmp.getDate()+'/'+(date_next_tmp.getMonth()+1)+'/'+date_next_tmp. getFullYear();
+  date_next=(date_next_tmp.getMonth()+1)+'/'+date_next_tmp.getDate()+'/'+date_next_tmp. getFullYear();
 		$('#detail').html('ย้ายไปเรียนวัน '+day[$('#day').val()]+' ที่ '+date_next+' เวลา '+$('#start_at').val() +' - '+$('#end_at').val() );
 });
 </script>

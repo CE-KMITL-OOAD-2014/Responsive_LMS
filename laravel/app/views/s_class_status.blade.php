@@ -27,7 +27,7 @@
 					echo '<tr>';
 						echo '<td>'.$i.'</td>';
 						echo '<td>'.$key.'</td>';
-                              echo '<td><button type="submit" class="btn btn-success" id="submit" onclick="location.href=\' '.url("student/set_class_assess/".$id."/".($i-1)).' \'">เลือกสถานะ</button> </td>'; 
+                              echo '<td><button type="submit" class="btn btn-success" id="submit" onclick="location.href=\' '.url("student/set_class_status/".$id."/".($i-1)).' \'">เลือกสถานะ</button> </td>'; 
 					echo '</tr>';
 					 $i++;
 				}

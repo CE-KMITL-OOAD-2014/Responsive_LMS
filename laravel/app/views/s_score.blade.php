@@ -22,8 +22,9 @@
         </thead>
 		<tbody>
 		<?php
-			/*for ($i=0;$i<count($sc);$i++) {
-					  $date_at=$table_message[$i]->{'created_at'};
+		//var_dump($sc);
+			for ($i=0;$i<count($sc);$i++) {
+					  $date_at=$sc[$i]->{'created_at'};
 					  if($date_at!=''){
 							$year = substr($date_at, 0, 4);
 							$year  = $year + 543;
@@ -32,19 +33,13 @@
 
 							$date_at = $day."-".$month."-".$year;
 					  }
-	    			  $output.= '<tr>'.   
-	    			  (($table_message[$i]->{'status'}=='1')?
-	    			 ' <td class=" text-center"><span class="glyphicon glyphicon-ok-sign green"></span></td>':
-	    			  '<td class=" text-center"><span class="glyphicon glyphicon-info-sign yellow"></span></td>')
-	    			 			   .' <td>'.$date_at.'</td>   
-								 	<td>'.$table_message[$i]->{'title'}.'</td>
-						            <td>'.$table_message[$i]->{'message'}.'</td>    									
-									<td><div class="btn-group">
-						             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">ดำเนินการ <span class="caret"></span> </button>
-						                <ul class="dropdown-menu pull-right" role="menu">
-						  	               <li><a href="'.url('/student/view_message/'.$table_message[$i]->{'ID'}).'">ดูรายละเอียด</a></li>
-							               </ul>
-							             </div></td>
+	    			  echo '<tr>'.   
+	    			 ' <td class=" text-center">'.($i+1).'</td>'
+	    			
+	    			 			   .' <td>'.$sc[$i]->{'id_assignment'}.'</td>
+
+								 	<td>'.(($sc[$i]->{'status_score'}=='0')?$sc[$i]->{'score'}:'ไม่กำหนดคะแนน').'</td>
+						            <td>'.$sc[$i]->{'detail_score'}.'</td>    									
 							        </tr>    ';
 				}
 			/*$i=1;

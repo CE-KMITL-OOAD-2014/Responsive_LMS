@@ -14,6 +14,7 @@
 					$text_statusTmp[$txtTmp[$i]->{'number'}] =  $txtTmp[$i]->{'text'};
 			}
     	}
+    	//copy constructor
     	public function cloneClassStatus(ClassStatus $classStatus){	
 			if($classStatus!=NULL){
 				$this->id_study=$classStatus->getId_study();
@@ -22,6 +23,7 @@
 				$this->text_status=$classStatus->getText_status();
 			}
 		}
+		//อ่านค่าสูงสุดจากตาราง
 		public static function getMaxId(){
 			$maxid= ClassStatusRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -31,6 +33,7 @@
 				return $maxid->ID;
 			}
 		}
+		//อ่านค่า object โดยอ้างอิงผ่าน id ของคลาสเรียน
 		public static function getFromIDStudy($id){
 			$dataTmp = ClassStatusRepository::where('id_study','=',$id)->get();
 			$txtTmp = ClassStatusTextRepository::all();
@@ -57,6 +60,7 @@
 			}
 
 		}
+		//คำนวณสถานะขณะเรียน
 		public function calculateStatus(){
 			$tmp=$this->getStatus();
 			$txtTmp = $this->getText_status();
@@ -73,6 +77,7 @@
 			}
 			return $result;
 		}
+		//ส่งค่าผลลัพธ์ที่มีค่าเป็น 0 สำหรับส่วนแสดงผลที่ไม่เคยมีการกำหนดสถานะ
 		public static function makeEmptyStatus(){
 			$txtTmp = ClassStatusTextRepository::all();
 			$result=array();

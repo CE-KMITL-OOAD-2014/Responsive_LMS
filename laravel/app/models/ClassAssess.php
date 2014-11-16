@@ -10,6 +10,7 @@
 			$this->score=NULL;
 			$this->text_assess=NULL;
     	}
+    	//copy constructor
     	public function cloneClassAssess(ClassAssess $classAssess){	
 			if($classAssess!=NULL){
 				$this->id_study=$classAssess->getId_study();
@@ -18,6 +19,7 @@
 				$this->text_assess=$classAssess->getText_assess();
 			}
 		}
+		//อ่านค่าสูงสุดของ id จากตารางการประเมิณ
 		public static function getMaxId(){
 			$maxid= ClassAssessRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -27,6 +29,7 @@
 				return $maxid->ID;
 			}
 		}
+		//อ่านค่า object โดยอ้างอิงผ่าน id ของคลาสเรียน
 		public static function getFromIDStudy($id){
 			$dataTmp = ClassAssessRepository::where('id_study','=',$id)->get();
 			$txtTmp = ClassAssessTextRepository::all();
@@ -61,7 +64,7 @@
 			}
 
 		}
-
+		//คำนวณผลลัพธ์ค่าเฉลี่ยคะแนนประเมิณ
 		public function calculateResult(){
 			$tmpScore=$this->getScore();
 			$tmpText=$this->getText_assess();
@@ -76,6 +79,7 @@
 			return $result;
 			
 		}
+		//ส่งค่าผลลัพธ์ที่มีค่าเป็น 0 สำหรับส่วนแสดงผลที่ไม่เคยมีการประเมิณ
 		public static function makeEmptyResult(){
 			$txtTmp = ClassAssessTextRepository::all();
 			$result=array();

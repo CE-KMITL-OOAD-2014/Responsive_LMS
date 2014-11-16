@@ -13,6 +13,7 @@
 		   	$this->status_del=0;
 		   	$this->detail_delete=NULL;
 		}
+		//copy constructor
 		public function copy(Admin $user){
 			parent::cloneUser($user);
 			$this->setStatus('9');
@@ -21,6 +22,7 @@
 		    $this->status_del=$user->getStatus_del();
 		    $this->detail_delete=$user->getDetail_delete();
 		}
+		//copy part of user to admin's object
 		public static function cloneFromUser(Users $user){
 			$obj = new Admin;
 			$obj->cloneUser($user);
@@ -49,6 +51,7 @@
 			}	
 			return false;
 		}
+		//get this object by specify id
 		public static function getFromId($id){
 			$userTmp = Users::getFromId($id);
 			if($userTmp!=NULL){
@@ -64,6 +67,7 @@
 			}
 			return NULL;
 		}
+		//get this object by specify username password
 		public static function getFromUserPass($user,$pass){
 			$dataTmp = Users::importFromUserPass($user,$pass);
 			if(count($dataTmp)==1){
@@ -73,6 +77,7 @@
 				return NULL;
 			}
 		}
+		//get last page for UI search
 		public static function getLastpage($condition){
 			$table = DB::table('user_admin')
             ->join('user', 'user_admin.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -82,6 +87,7 @@
             })->where('user_admin.status_del','=','0')->count();
 			return  max(ceil($table/Admin::ROWPERPAGE),1);
 		}
+		//get objects's number for UI search
 		public static function getCount($condition){
 			$table = DB::table('user_admin')
             ->join('user', 'user_admin.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -91,6 +97,7 @@
             	})->where('user_admin.status_del','=','0')->count();
 			return  $table;
 		}
+		//get objects for UI search
 		public static function search($condition,$currentPage){
 			$table = DB::table('user_admin')
             ->join('user', 'user_admin.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -98,8 +105,8 @@
                  ->orWhere('user.surname','like','%'.$condition['word'].'%')
                  ->orWhere('user_admin.position','like','%'.$condition['word'].'%');
             })->where('user_admin.status_del','=','0')->get();
-           	$i = ($currentPage-1)* Admin::ROWPERPAGE;
-            $j = $i+min(Admin::ROWPERPAGE,count($table)-$i);
+           	$i = ($currentPage-1)* Admin::ROWPERPAGE; //determine start position object
+            $j = $i+min(Admin::ROWPERPAGE,count($table)-$i);//determine end position object
             $output=array();
             for($k=0;$i<$j;$i++,$k++){
             	$output[$k]=$table[$i];
@@ -108,7 +115,7 @@
 
 		}
 			
-
+		//เพิ่มผู้ใช้งานในระบบ
 		public function addUser(Users $user){
 			$dataTmp = UsersRepository::where('ID','=',$user->getID())->orWhere('username','=',$user->getUsername())->get();
 			if(count($dataTmp)==0){
@@ -217,6 +224,7 @@
 				return false;
 			}
 		}
+		//แก้ไขข้อมูลผู้ใช้งาน
 		public function editUser(Users $user){
 			return $user->update();
 		}
@@ -232,6 +240,7 @@
 		public function editSubject(Subject $subj){
 			return $subj->update();
 		}
+		//ลบผู้ใช้งานจากระบบ
 		public function delAdmin(Admin $user,$detail_delete){
 			$user->setDetail_delete($detail_delete);
 			$user->setStatus_del('1');

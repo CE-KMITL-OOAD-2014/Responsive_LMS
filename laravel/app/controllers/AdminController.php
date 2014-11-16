@@ -1,14 +1,16 @@
 <?php
 
 	class AdminController extends BaseController {
+		//แสดงหน้าหลักเวลาloginเสร็จเรียบร้อย
 		public function showHome(){
-			Authen::refresh();
-			$tmp=unserialize(Cookie::get('user',null));
-			if(!Admin::userIsAdmin($tmp)){
+			Authen::refresh(); //อัพเดท cookie จากระบบฐานข้อมูล
+			$tmp=unserialize(Cookie::get('user',null)); 
+			if(!Admin::userIsAdmin($tmp)){ //ดึงค่า cookie มาตรวจสอบสิทธิ์การใช้งาน
 				return Redirect::to('/');
 			}
 			return View::make('admin')->with('active', array('active','','','',''));
 		}
+		//แสดงหน้าviewจากการกดเมนูต่างๆเช่นเมนูบน header
 		public function showPage($page){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -31,6 +33,7 @@
 			}
 			return View::make($page)->with('active', $active);
 		}
+		//ลงทะเบียนผู้ใช้งานในสิทธิ์ต่างๆ ไปยังระบบฐานข้อมุลตามแบบฟอร์มที่กรอก
 		public function addUser($type){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -103,6 +106,7 @@
 
 			}
 		}
+		//เพิ่มวิชาไปยังระบบฐานข้อมูล
 		public function addSubject(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -125,6 +129,7 @@
 			$tmp->addSubject($input);
 			return Redirect::to('admin/subject');
 		}
+		// แก้ไขข้อมูลผู้ใช้งานเดิมในระบบฐานข้อมุลในสิทธิ์ต่างๆ ตามแบบฟอร์ม
 		public function editUser($type){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -144,8 +149,6 @@
 				$userInput->setEmail(Input::get('email'));
 				$userInput->setTelephone(Input::get('telephone'));
 				$userInput->setPosition(Input::get('position'));
-				//$userInput->setStatus_del('0');
-				//$userInput->setDetail_delete(Input::get('detail_delete'));
 				$tmp->editAdmin($userInput);
 				return Redirect::to('admin/user_admin');
 			}
@@ -171,9 +174,6 @@
 				$userInput->setStudent_status(Input::get('student_status'));
 				$userInput->setDepartment(Input::get('department'));
 				$userInput->setMajor(Input::get('major'));		
-				//$userInput->setStatus_del('0');
-				//$userInput->setDetail_delete(Input::get('detail_delete'));
-				//$userInput->setSubjects(Input::get('subjects'));
 				$tmp->editStudent($userInput);
 				return Redirect::to('admin/user_student');
 
@@ -206,6 +206,7 @@
 
 
 		}
+		//แก้ไขข้อมูลรายวิชา
 		public function editSubject(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -226,7 +227,7 @@
 			$tmp->editSubject($subjInput);
 			return Redirect::to('admin/subject');
 		}
-
+		//ตั้งค่าสถานะของผู้ใช้งานให้อยู่ในสถาะนะระงับการใช้งาน
 		public function deleteUser($type){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -255,6 +256,7 @@
 
 			}
 		}
+		//ตั้งสถาะวิชาให้เป็นระงับการใช้งาน
 		public function AdmindeleteSubject(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -266,6 +268,7 @@
 			$tmp->delSubject($subjInput,$detail_delete);
 			return Redirect::to('admin/subject');
 		}
+		//ค้นหา admin สำหรับใช้ในหน้าต่างค้นหา
 		public function searchAdmin($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -278,7 +281,7 @@
 				$table_admin = Admin::search($condition,$currentPage);
 
 				$output = '';
-				for ($i=0;$i<count($table_admin);$i++) {
+				for ($i=0;$i<count($table_admin);$i++) { //จัดรูปแบบให้อยู่ในรูปตาราง ก่อนไปยังหน้าแสดงผล
 	    			  $output.= '<tr>   
 	    			 				 <td>'.$table_admin[$i]->{'username'}.'</td>   
 								 	<td>'.$table_admin[$i]->{'title'}.'</td>
@@ -300,12 +303,10 @@
 				return $output;
 			}
 			if($method=='get_lastpage'){
-				//return 'get_lastpage';
 				$condition = Input::get('condition');
 				return Admin::getLastpage($condition);
 			}
 			if($method=='get_count'){
-				//return 'get_count';
 				$condition = Input::get('condition');
 				return Admin::getCount($condition);
 			}
@@ -351,7 +352,7 @@
 				$condition = Input::get('condition');
 				return Student::getCount($condition);
 			}
-			if($method=='search_subject_add'){
+			if($method=='search_subject_add'){ //ค้นหานักเรียนในหน้เพิ่มนักเรียนเข้าไปยังรายวิชา ในรูปแบบตาราง
 				$table_student = Student::search($condition,$currentPage);
 				$output = '';
 				for ($i=0;$i<count($table_student);$i++) {
@@ -371,6 +372,7 @@
 				return $output;
 			}
 		}
+		//ทำงานเหมือน searchStudent แต่เป็นการค้นหาอาจารย์
 		public function searchTeacher($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -433,7 +435,7 @@
 				return $output;
 			}
 		}
-		
+		//ค้นหารายวิชา และแสดงผลในรูปแบบตาราง
 		public function searchSubject($method){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -477,6 +479,7 @@
 				return Subject::getCount($condition);
 			}
 		}
+		//กำหนดอาจารย์ในวิชา
 		public function subjectEditTeacher(){
 			$teachers = Input::get('teachers');
 			$subjInput = Subject::getFromID(Input::get('id'));
@@ -488,6 +491,7 @@
 			$subjInput->teacherUpdate();
 			return Redirect::to('/subject_add_teacher/'.Input::get('id')); 
 		}
+		//กำหนดนักเรียนในวิชา
 		public function subjectEditStudent(){
 			$students = Input::get('students');
 			$subjInput = Subject::getFromID(Input::get('id'));
@@ -499,7 +503,7 @@
 			$subjInput->studentUpdate();
 			return Redirect::to('/subject_add_student/'.Input::get('id')); 
 		}
-		
+		//แก้ไขข้อมูลรหัสผ่านของตัเอง
 		public function userEdit(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -512,6 +516,7 @@
 			return Redirect::to('/');
 
 		}
+		//แก้ไขข้อมูลส่วนตัวอื่นๆ
 		public function userWaitting(){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -528,6 +533,7 @@
 			return Redirect::to('/');
 
 		}
+		//เพิ่มอาจารย์ไปยังรายวิชา
 		public function subjectAddTeacher($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -558,7 +564,7 @@
 			return Redirect::to('/');
 
 		}
-		
+		//แสดงผลหน้าแก้ไขข้อมูลผู้ใช้ Admin
 		public function viewEditAdmin($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));
@@ -611,6 +617,7 @@
 			}
 			return Redirect::to('/');
 		}
+		//แสดงผลหน้าระบุรายละเอียดของก่อนลบผู้ใช้ Admin
 		public function deleteAdmin($id){
 			Authen::refresh();
 			$tmp=unserialize(Cookie::get('user',null));

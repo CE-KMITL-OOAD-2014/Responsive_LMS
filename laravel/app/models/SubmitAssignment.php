@@ -49,11 +49,13 @@ class SubmitAssignment extends Contact{
 				
 			}
 	    }
+		//copy constructor
 	    public static function cloneFromContact(Contact $contact){
 			$obj = new SubmitAssignment;
 			$obj->cloneContact($contact);
 			return $obj;
 		} 
+		//get maximum column 'id'
 		public static function getMaxId(){
 	    	$maxid= SubmitAssignmentRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -64,6 +66,7 @@ class SubmitAssignment extends Contact{
 					return $maxid->ID;
 			}
 		}
+		//get maximum column 'id' ของ file
 		public static function getMaxFileID(){
 			$maxid= FileRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -74,6 +77,7 @@ class SubmitAssignment extends Contact{
 					return $maxid->ID;
 			}
 		}
+		//get หน้าสุดท้ายที่ใช้สำหรับแสดงผล
 		public static function getLastpage($condition,$id_user){
 			if($condition['check'] =='1'){
 				if($condition['uncheck'] == '1'){
@@ -105,6 +109,7 @@ class SubmitAssignment extends Contact{
 			
 			return  max(ceil($table/Assignment::ROWPERPAGE),1);
 		}
+		//get จำนวนทั้งหมดของงานที่ส่ง
 		public static function getCount($condition,$id_user){
 			if($condition['check'] =='1'){
 				if($condition['uncheck'] == '1'){
@@ -135,6 +140,7 @@ class SubmitAssignment extends Contact{
 			}
 			return  $table;
 		}
+		//ค้นหาข้อมูลของงานที่ส่งตามเงื่อนไข
 		public static function search($condition,$currentPage,$id_user){
 			if($condition['check'] =='1'){
 				if($condition['uncheck'] == '1'){
@@ -147,7 +153,7 @@ class SubmitAssignment extends Contact{
             				->where('contact.receiver','=',$id_user)
 							->where('submit_assignment.id_assignment','=',$condition['idass'])
             				->get(array('submit_assignment.status','contact.ID','submit_assignment.created_at','user_student.id_student',
-            					'submit_assignment.detail','submit_assignment.id_doc','submit_assignment.score','submit_assignment.detail_score','file.name'));
+            					'submit_assignment.detail','submit_assignment.id_doc','submit_assignment.score','submit_assignment.detail_score','file.name','submit_assignment.id_assignment'));
 				}
 				else{
 						$table = DB::table('submit_assignment')
@@ -190,6 +196,7 @@ class SubmitAssignment extends Contact{
             return $output;
 
 		}
+		//get this object ด้วย id ของ contact แล้วใช้ idsubtable ในการค้นหางานที่ส่งด้วย id 
 		public static function getFromId($id){
 			$conTmp = Contact::getFromId($id);
 			if($conTmp!=NULL){
@@ -238,14 +245,17 @@ class SubmitAssignment extends Contact{
 				}
 			}
 			return NULL;
+
 			
 		}
-		public static function getscore($id_student,$id_subj){
-					$table = DB::table('submit_assignment')
-            				->join('contact', 'contact.idsubtable','=','submit_assignment.ID' )
+		//get งานที่ส่งของนักศึกษาพร้อมคะแนน
+		public static function getScoreAll($id_student,$id_subj){
+					$table = DB::table('contact')
+
+            				->join('submit_assignment', 'contact.idsubtable','=','submit_assignment.ID' )
+            				->join('assignment', 'submit_assignment.id_assignment','=','assignment.ID' )
             				->where('contact.group_id','=','submit_assignment')
-            				->where('submit_assignment.status_score','=','0')
-            				->where('contact.receiver','=',$id_student)
+            				->where('contact.sender','=',$id_student)
 							->where('submit_assignment.id_subject','=',$id_subj)
             				->get();
 				

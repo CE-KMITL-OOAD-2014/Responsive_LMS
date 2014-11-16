@@ -21,6 +21,7 @@
 			$this->detail_delete=NULL;
 			$this->subjects=NULL;
 		}
+		//copy constructor
 		public function copy(Teacher $user){
 			parent::cloneUser($user);
 			$this->setStatus('1');
@@ -33,11 +34,13 @@
 			$this->detail_delete=$user->getDetail_delete();
 			$this->subjects=$user->getSubjects();
 		}
+		//คัดลอกข้อมูลส่วน user 
 		public static function cloneFromUser(Users $user){
 			$obj = new Teacher;
 			$obj->cloneUser($user);
 			return $obj;
 		} 
+		//หาค่าสูงสุดของ ID ในฐานข้อมูลอาจารย์
 		public static function getMaxId(){
 			$maxid= TeacherRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -65,6 +68,7 @@
 			}	
 			return false;
 		}
+		//อ่านค่าข้อมูลโดยระบุ id
 		public static function getFromId($id){
 			$userTmp = Users::getFromId($id);
 			if($userTmp!=NULL){
@@ -91,7 +95,7 @@
 			return NULL;
 
 		}
-
+		//อ่านค่าข้อมูลโดยระบุ username password
 		public static function getFromUserPass($user,$pass){
 			$dataTmp = Users::importFromUserPass($user,$pass);
 			if(count($dataTmp)==1){
@@ -101,6 +105,7 @@
 				return NULL;
 			}
 		}
+		//หาจำนวนหน้าสำหรับส่วนแสดงผล
 		public static function getLastpage($condition){
 			$table = DB::table('user_teacher')
             ->join('user', 'user_teacher.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -113,6 +118,7 @@
 
 
 		}
+		//หาจำนวนข้อมูลสำหรับส่วนแสดงผล
 		public static function getCount($condition){
 			$table = DB::table('user_teacher')
             ->join('user', 'user_teacher.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -123,6 +129,7 @@
             })->where('user_teacher.status_del','=','0')->count();
 			return  $table;
 		}
+		//หาข้อมูลสำหรับส่วนแสดงผล
 		public static function search($condition,$currentPage){
 			$table = DB::table('user_teacher')
             ->join('user', 'user_teacher.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -199,10 +206,10 @@
 			'detail_delete ='.$this->detail_delete.'<br>'.
 			'subjects ='.json_encode($this->subjects);
 		}
-		public static function userIsTeacher($user){
+		public static function userIsTeacher($user){ //ตรวจสอบผู้ใช้ว่าเป็นอาจารย์หรือไม่
 			return ($user!=NULL) && ($user->getStatus()== '1');
 		}
-		public function getSubjectsFromeId($id){
+		public function getSubjectsFromeId($id){//ค้นหารายวิชาทั้งหมดที่มีอาจารย์ตาม id ที่ระบุ
 			$userTmp = Users::getFromId($id);
 			$arr = array();
 			$obj = Teacher::cloneFromUser($userTmp);

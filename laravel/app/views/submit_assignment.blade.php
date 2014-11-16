@@ -20,7 +20,7 @@
         <input type="checkbox" id="show_data_02" value="show_data_02" onclick="search_data();" checked>
         <span class="glyphicon glyphicon-info-sign yellow "></span>งานที่ยังไม่ตรวจ</label>
 	  <label class="checkbox-inline">
-        <input  type="hidden" id="ass_input" value="{{ $ass->getId_assignment() }}" ></label>
+        <input  type="text" id="ass_input" value="{{ $ass->getID() }}" ></label>
 
     </div>  
     </div>

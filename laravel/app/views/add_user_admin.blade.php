@@ -9,7 +9,7 @@
     <div class="page-header">
       <h1>รายละเอียดAdmin</h1>
     </div>
-    <form class="form-horizontal" method="post" action="{{ url('/admin/add_subject') }}">    
+    <form class="form-horizontal" method="post" action="{{ url('admin_add/admin') }}">    
       <div class="col-lg-12">
         <div class="panel panel-success">
           <div class="panel-heading">รายละเอียด</div>

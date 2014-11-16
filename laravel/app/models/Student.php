@@ -33,6 +33,7 @@
 			$this->detail_delete=NULL;
 		    $this->subjects=NULL;
 		}
+		//copy constructor
 		public function copy(Student $user){
 			parent::cloneUser($user);
 			$this->setStatus('0');
@@ -56,6 +57,7 @@
 			$obj->cloneUser($user);
 			return $obj;
 		} 
+		 //หาค่าสูงสุดของ id ใน DB
 		public static function getMaxId(){
 			$maxid= StudentRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -83,6 +85,7 @@
 			}	
 			return false;
 		}
+		//อ่านค่าข้อมูลจาก DB โดยระบุ id
 		public static function getFromId($id){
 			$userTmp = Users::getFromId($id);
 			if($userTmp!=NULL){
@@ -115,6 +118,7 @@
 			return NULL;
 
 		}
+		//อ่าข้อมูลโดยระบุ username password
 		public static function getFromUserPass($user,$pass){
 			$dataTmp = Users::importFromUserPass($user,$pass);
 			if(count($dataTmp)==1){
@@ -124,6 +128,7 @@
 				return NULL;
 			}
 		}
+		//หาจำนวนหน้าสำหรับส่วนแสดงผล
 		public static function getLastpage($condition){
 			$table = DB::table('user_student')
             ->join('user', 'user_student.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -137,6 +142,7 @@
 
 
 		}
+		//หาจำนวนข้อมูลสำหรับส่วนแสดงผล
 		public static function getCount($condition){
 			$table = DB::table('user_student')
             ->join('user', 'user_student.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -148,6 +154,7 @@
             })->where('user_student.status_del','=','0')->count();
 			return  $table;
 		}
+		//ค้นหาข้อมูลสำหรับส่วนแสดงผล
 		public static function search($condition,$currentPage){
 			$table = DB::table('user_student')
             ->join('user', 'user_student.id_user', '=', 'user.ID')->where(function($query) use($condition) {
@@ -251,6 +258,7 @@
 		public function getSubjects(){
 			return $this->subjects;
 		}
+		//ตรวจสอบว่า ผู้ใช้เป็น นักเรียนหรือไม่
 		public static function userIsStudent($user){
 			return ($user!=NULL) && ($user->getStatus()== '0');
 		}

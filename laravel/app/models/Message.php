@@ -15,6 +15,7 @@ class Message extends Contact{
 			$this->detail_delete=NULL;
 			$this->created_at=NULL;
 	    }
+		//copy constructor
 	    public function copy(Message $message){
 	    	if($message!=NULL){
 	    		$this->id=$message->getID();
@@ -30,6 +31,7 @@ class Message extends Contact{
 			$obj->cloneContact($contact);
 			return $obj;
 		} 
+		//get maximum column 'id'
 		public static function getMaxId(){
 	    	$maxid= MessageRepository::orderBy('ID', 'DESC')->first();
 			if(!isset($maxid)){
@@ -40,6 +42,7 @@ class Message extends Contact{
 					return $maxid->ID;
 			}
 		}
+		//get หน้าสุดท้ายที่ใช้สำหรับแสดงผล
 		public static function getLastpage($condition,$id_user){
 
 			if($condition['read'] =='1'){
@@ -69,6 +72,7 @@ class Message extends Contact{
 			
 			return  max(ceil($table/Assignment::ROWPERPAGE),1);
 		}
+		//get จำนวนทั้งหมดของข้อความ
 		public static function getCount($condition,$id_user){
 			if($condition['read'] =='1'){
 				if($condition['unread'] == '1'){
@@ -96,24 +100,25 @@ class Message extends Contact{
 			}
 			return  $table;
 		}
+		//ค้นหาข้อมูลของข้อความตามเงื่อนไข
 		public static function search($condition,$currentPage,$id_user){
 			if($condition['read'] =='1'){
 				if($condition['unread'] == '1'){
-						$table = DB::table('contact')
-            				->join('message', 'contact.idsubtable', '=', 'message.ID')->where('contact.group_id','=','message')
+						$table = DB::table('message')
+            				->join('contact', 'contact.idsubtable', '=', 'message.ID')->where('contact.group_id','=','message')
             				->where('contact.receiver','=',$id_user)->get();
 				}
 				else{
-						$table = DB::table('contact')
-            				->join('message', 'contact.idsubtable', '=', 'message.ID')->where('contact.group_id','=','message')
+						$table = DB::table('message')
+            				->join('contact', 'contact.idsubtable', '=', 'message.ID')->where('contact.group_id','=','message')
             				->where('message.status','=','1')
             				->where('contact.receiver','=',$id_user)->get();
 				}
 			}
 			else{
 				if($condition['unread'] == '1'){
-						$table = DB::table('contact')
-            				->join('message', 'contact.idsubtable', '=', 'message.ID')->where('contact.group_id','=','message')
+						$table = DB::table('message')
+            				->join('contact', 'contact.idsubtable', '=', 'message.ID')->where('contact.group_id','=','message')
             				->where('message.status','=','0')
             				->where('contact.receiver','=',$id_user)->get();
 				}
@@ -130,6 +135,7 @@ class Message extends Contact{
             return $output;
 
 		}
+		//get this object ด้วย id ของ contact แล้วใช้ idsubtable ในการค้นหาข้อความด้วย id 
 		public static function getFromId($id){
 			$conTmp = Contact::getFromId($id);
 			if($conTmp!=NULL){
