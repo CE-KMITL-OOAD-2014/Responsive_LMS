@@ -319,6 +319,7 @@ class Absent extends Contact{
 					$obj->setName_file($fileTmp->name);
 					//ค้นหาเอกสาร
 					if($dataTmp->id_doc!='0'){
+						//connection to Storage azure reference http://www.thaicreate.com/windows-azure.html#windows-azure-storage-php
 						$connectionString = "DefaultEndpointsProtocol=http;AccountName=rpslmssr;AccountKey=NJ7zmjCLPbw6n7ySPWZRQ0EgR48jjzolffMpMApBVPl2yYfOqgfz0To4C57/lAACSrGL/1AElzeIuwbc6lJNTA==";
 						$blobRestProxy = ServicesBuilder::getInstance()->createBlobService($connectionString);
 						$blob_list = $blobRestProxy->listBlobs("docs");
